@@ -15,7 +15,7 @@ export function Navbar(){
         <Link href="/relatorio" className="hover:text-blue-200 transition">Relatório</Link>
         <button
           onClick={() => { localStorage.removeItem("token"); router.push('/login'); }}
-          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
+          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition cursor-pointer"
         >
           Sair
         </button>
