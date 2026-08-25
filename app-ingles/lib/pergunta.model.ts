@@ -25,8 +25,8 @@ export async function salvarQuizCompleto(quizData: QuizData, perguntas: Pergunta
 
 
   const [quiz] = await conn.query<ResultSetHeader>(
-    "INSERT INTO quiz (usuario_id, dificuldade, nota, data) VALUES (?,?,?,CURDATE())",
-    [quizData.usuario_id, quizData.dificuldade, quizData.nota],
+    "INSERT INTO quiz (usuario_id, dificuldade, nota, data, total_perguntas) VALUES (?,?,?,CURDATE(), ?)",
+    [quizData.usuario_id, quizData.dificuldade, quizData.nota, perguntas.length],
   );
 
 

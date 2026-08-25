@@ -15,6 +15,7 @@ CREATE TABLE quiz(
     dificuldade INT NOT NULL,
     nota INT NOT NULL,
     data DATE NOT NULL,
+    total_perguntas INT NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 

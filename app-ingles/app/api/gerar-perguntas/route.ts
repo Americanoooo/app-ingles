@@ -2,6 +2,9 @@ export async function POST(req: Request) {
   try{
   const API_KEY = process.env.GEMINI_API_KEY;
   const { dificuldade, quantidade } = await req.json();
+  if(!dificuldade || !quantidade || Number(quantidade) < 1){
+    return Response.json({error: "Dificuldade e quantidade são obrigatórias"}, {status:400})
+  }
   const resposta = await fetch(
     "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     {

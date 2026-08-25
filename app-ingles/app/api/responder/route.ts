@@ -44,11 +44,11 @@ export async function POST(req: Request){
     const nota =  perguntasCorrigidas.filter((r)=> r.acertou).length
     const quizData = {usuario_id, dificuldade, nota};
     
-    const resultado = await salvarQuizCompleto(quizData, perguntasCorrigidas)
-    return Response.json({resultado, acertou: nota}, {status:201})
+        await salvarQuizCompleto(quizData, perguntasCorrigidas)
+            return Response.json({perguntasCorrigidas, acertou: nota}, {status:201})
     }catch(err:unknown){
         const error = err instanceof Error ? err.message : 'Erro ao salvar quiz'
-        return Response.json({mensagem: 'Não foi possível cadastrar o quiz', error}, {status:500})
+            return Response.json({mensagem: 'Não foi possível cadastrar o quiz', error}, {status:500})
     }
 
 
