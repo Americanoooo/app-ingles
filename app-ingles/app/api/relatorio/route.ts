@@ -1,5 +1,5 @@
 import { pegarUsuarioId } from "@/lib/auth";
-import { listaQuiz } from "@/lib/quiz.model";
+import { relatorio } from "@/lib/relatorio.model";
 
 export async function GET(req: Request){
     let usuario_id: number
@@ -11,10 +11,8 @@ export async function GET(req: Request){
     }
 
     try{
-        const resposta = await listaQuiz(usuario_id)
-        if(resposta.length ===0){
-            
-        }
+        const resposta = await relatorio(usuario_id)
+        
 
       
         return Response.json({quizzes: resposta}, {status:200})

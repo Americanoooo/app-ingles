@@ -5,7 +5,9 @@ export async function POST(req: Request){
 
 try{
      const {quizData, perguntas} = await req.json()
-
+        if(!quizData || !perguntas){
+                return Response.json({error: 'Dados incompletos'}, {status:400})
+        }
 
     await salvarQuizCompleto(quizData, perguntas)
     return Response.json({mensagem: 'Perguntas cadastradas com sucesso', perguntas: perguntas}, {status: 201})
