@@ -2,6 +2,8 @@ import { cadastrarUsuario } from '@/lib/cadastrar.model'
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
+export const dynamic = "force-dynamic";
+
 const cadastrarSchema = z.object({
     email:z
     .string()

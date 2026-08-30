@@ -1,9 +1,13 @@
 "use client";
 
 import { apiFetch } from "@/lib/apiFetch";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import {  buttonVariants } from "@/components/ui/button";
+
+
 
    interface Quiz{
      enunciado:string, 
@@ -37,18 +41,19 @@ function QuizUnico(){
 
 
     return (
-        <div   className="min-h-screen bg-slate-200 flex flex-col items-center justify-center">
-            <div className= "flex flex-col gap-10 bg-white h-150 w-1/2 rounded shadow p-3 justify-start">
+        <div className="min-h-screen bg-slate-200 flex flex-col items-center justify-center">
+            <Card className="w-full max-w-3xl">
+            <CardContent className="flex flex-col gap-10 justify-start min-h-100 max-h-150 overflow-y-auto">
             {carregando ===true ?(
-                <h1 className="text-center font-semibold">Carregando...</h1>
+                <h1 className="text-center text-xl ">Carregando...</h1>
             ): (
 
-            
-                          <div className= "flex flex-col gap-10 bg-white h-150  rounded shadow p-3 justify-start overflow-y-auto">
+
+                        <>
                         {quiz.map((p, indexPergunta)=> (
-                            <div key={indexPergunta} className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3"> 
-                            <p className="text-lg font-medium">{indexPergunta + 1}.{p.enunciado}</p>
-                            <div className={`flex flex-col border rounded-lg p-4 ${
+                            <div key={indexPergunta} className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3">
+                            <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>
+                            <div className={`flex flex-col border rounded-lg p-4 text-lg ${
                                 p.resposta_certa === p.resposta_usuario
                                 ? "border-green-500 bg-green-50"
                                 : "border-red-500 bg-red-50"
@@ -56,16 +61,18 @@ function QuizUnico(){
                                 <p>Resposta correta: {p.resposta_certa}</p>
                                 <p>Resposta do usuário: {p.resposta_usuario}</p>
                                 </div>
-                                   
-                                
+
+
                             </div>
                         ))}
-                        </div>
+                        </>
                         )}
-            
-            </div>
-            <Link href='/relatorio'className="bg-gray-400 text-white p-2 rounded cursor-pointer " >
-            Voltar</Link>
+
+            </CardContent>
+            </Card>
+           <Link href="/relatorio" className={buttonVariants({ variant: "outline" })}>
+                    Voltar
+            </Link>
         </div>
     )
 }

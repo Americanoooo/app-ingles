@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try{
   const API_KEY = process.env.GEMINI_API_KEY;

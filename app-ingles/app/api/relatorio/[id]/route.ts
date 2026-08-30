@@ -1,6 +1,7 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { buscarRelatorioCompleto } from "@/lib/relatorioCompleto.model";
 
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request, {params}:{params: Promise<{id: string}>}){
     let usuario_id: number

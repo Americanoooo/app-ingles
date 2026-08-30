@@ -1,6 +1,8 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { relatorio } from "@/lib/relatorio.model";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request){
     let usuario_id: number
     try{

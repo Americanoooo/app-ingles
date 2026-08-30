@@ -1,8 +1,8 @@
 import { RowDataPacket } from "mysql2";
-import { pool } from "./db";
+import { getPool } from "./db";
 
 export async function login(email:string){
-    const [resultado] = await pool.query<RowDataPacket[]>(
+    const [resultado] = await getPool().query<RowDataPacket[]>(
         'SELECT * FROM usuario WHERE email =?',
         [email]
     )

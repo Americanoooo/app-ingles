@@ -1,5 +1,5 @@
 import  jwt  from "jsonwebtoken"
-import { JWT_SECRET } from "../app/api/config"
+import { getJwtSecret} from "../app/api/config"
 
 export  function pegarUsuarioId(req: Request){
  
@@ -9,7 +9,7 @@ export  function pegarUsuarioId(req: Request){
         throw new Error('Token não fornecido')
     }
 
-    const payload = jwt.verify(token, JWT_SECRET as string)
+    const payload = jwt.verify(token, getJwtSecret() as string)
     const {usuario_id} = payload as {usuario_id: number}
     return usuario_id
 }

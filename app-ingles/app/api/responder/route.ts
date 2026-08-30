@@ -18,7 +18,7 @@ const responderSchema = z.object({
     .min(1),
 })
 
-
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request){
     let usuario_id : number

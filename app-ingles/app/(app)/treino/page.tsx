@@ -2,9 +2,12 @@
 
 import { apiFetch } from "@/lib/apiFetch";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
     interface Pergunta {
-        enunciado:string, 
+        enunciado:string,
         categoria: string,
         opcoes:string[],
         resposta_certa:string,
@@ -43,7 +46,7 @@ function Treino(){
         if(!dificuldade || !quantidade || Number(quantidade) < 1) return setErro('Preencha todos os campos')
     setCarregando(true)
         try{
-        const data = await apiFetch('/api/gerar-perguntas', 
+        const data = await apiFetch('/api/gerar-perguntas',
             {method:'POST',
             body: JSON.stringify({dificuldade, quantidade})}
         )
@@ -65,14 +68,14 @@ function Treino(){
             const respostasQuiz = perguntas.map((p, indexPergunta)=> ({
                 ...p,
                 resposta_usuario: respostas[indexPergunta]
-            })) 
-            
-            const data = await apiFetch('/api/responder', 
+            }))
+
+            const data = await apiFetch('/api/responder',
                 {method: 'POST',
                     body: JSON.stringify({dificuldade, respostaQuiz: respostasQuiz})
                 }
             )
-    
+
             console.log(data)
                 setResultado(data.perguntasCorrigidas)
                 setAcertos(data.acertou)
@@ -97,85 +100,98 @@ function Treino(){
     return(
         <>
         <div className="min-h-screen bg-slate-200 flex items-center justify-center">
-          
+
             {tela === 'setup' && (
-            <div className= "flex flex-col gap-5 bg-white h-120 w-1/3 rounded shadow p-3 items-center">
-                <h1 className="text-center text-xl">Treine seu inglês</h1>
+            <Card className="min-h-120 w-1/3 py-3 gap-5">
+                <CardHeader className="px-3">
+                    <CardTitle className="text-center text-xl">Treine seu inglês</CardTitle>
+                </CardHeader>
+                <CardContent className="px-3 flex flex-col gap-5 items-center">
                 {carregando ===false ? (
                     <>
-                   
+
                 <div className="flex justify-center gap-10">
                     <h2 className="text-xl">Escolha a  dificuldade:</h2>
                     <div className="flex gap-5 ">
-                    <button className={`text-white p-2 rounded cursor-pointer ${dificuldade === 1 ? "bg-blue-600" : "bg-blue-500"} `} onClick={()=> setDificuldade(1)}>Fácil</button>
-                    <button className={`text-white p-2 rounded cursor-pointer ${dificuldade === 2 ? "bg-blue-600" : "bg-blue-500"} `} onClick={()=> setDificuldade(2)}>Média</button>
-                    <button className={`text-white p-2 rounded cursor-pointer ${dificuldade === 3 ? "bg-blue-600" : "bg-blue-500"} `} onClick={()=> setDificuldade(3)}>Difícil</button>
+                    <Button variant={dificuldade === 1 ? "default" : "outline"} onClick={()=> setDificuldade(1)}>Fácil</Button>
+                    <Button variant={dificuldade === 2 ? "default" : "outline"} onClick={()=> setDificuldade(2)}>Média</Button>
+                    <Button variant={dificuldade === 3 ? "default" : "outline"} onClick={()=> setDificuldade(3)}>Difícil</Button>
                     </div>
                 </div>
 
                 <div className="flex justify-center gap-10">
                     <h2 className="text-center text-xl">Escolha a quantidade de perguntas:</h2>
-                    <input 
-                    className="border w-15 rounded p-1 "
+                    <Input
+                    className="w-20"
                     value={quantidade}
                     onChange={(e)=> setQuantidade(e.target.value)}
                     type="number"
                     min={1}/>
 
-                </div> 
+                </div>
                 {erro && <p className="text-red-500">{erro}</p>}
-            <button onClick={handleQuiz}    className="bg-blue-500 text-white w-1/3 p-2 rounded-xl cursor-pointer " >Gerar quiz</button>
-             </>) :( 
-                
+            <Button onClick={handleQuiz} className="w-1/3">Gerar quiz</Button>
+             </>) :(
+
                 <div>
-                    <h1 className="text-xl font-semibold">Carregando...</h1>
+                    <h1 className="text-xl ">Carregando...</h1>
                 </div>
 
             )}
-            </div>
+            </CardContent>
+            </Card>
                 )} {tela === 'quiz'  &&(
-                    <div className= "flex flex-col gap-10 bg-white h-150 w-1/2 rounded shadow p-3 justify-start overflow-y-auto">
+                    <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
+                        <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-7 justify-start">
                         {perguntas.map((p, indexPergunta)=> (
-                            <div key={indexPergunta} className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3"> 
-                            <p className="text-lg font-medium">{indexPergunta + 1}.{p.enunciado}</p>
-                            <div className="flex flex-col gap-3"> 
+                            <Card key={indexPergunta} className="shrink-0">
+                            <CardContent className="flex flex-col gap-3 py-4">
+                            <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>
+                            <div className="flex flex-col gap-3 py-1">
                             {p.opcoes.map((o, indexOpcao)=> (
-                                <button key={indexOpcao}
+                                <Button key={indexOpcao}
+                                variant={respostas[indexPergunta] === o ? "default" : "outline"}
                                 onClick={()=> setRespostas({... respostas, [indexPergunta]: o})}
-                                className={`text-left w-full border rounded-lg px-4 py-2 transition cursor-pointer ${
-  respostas[indexPergunta] === o
-    ? "bg-blue-600 text-white border-blue-600"
-    : "border-slate-300 hover:bg-slate-100"
-}`}>{o}</button>
-                                
+                                className="w-full justify-start text-left h-auto py-1">{o}</Button>
+
                             ))}
                             </div>
-                            </div>
+                            </CardContent>
+                            </Card>
                         ))}
-                    <button onClick={handleEnviar} className="bg-blue-500 text-white w-1/3 p-2 rounded-xl  cursor-pointer " >Enviar</button>
+                        <div className="flex justify-center">
+                          
+                    <Button onClick={handleEnviar} className="w-1/3">Enviar</Button>
+                      
                         </div>
+                        </CardContent>
+                    </Card>
                 )}
 
                 {tela === 'resultado' && (
-                    <div className= "flex flex-col gap-10 bg-white h-150 w-1/2 rounded shadow p-3 justify-start overflow-y-auto">
+                    <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
+                      <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-10 justify-start">
                       <div className="flex items-center">
-                        
-                       <button className="bg-gray-400 rounded text-white w-1/6 px-3 py-1 cursor-pointer" onClick={()=>  reiniciar()}>Voltar</button>
-                        <h1 className="flex-1 text-center text-xl font-semibold ">Você acertou: {acertos} de {resultado.length}</h1>
+
+                       <Button variant="outline" className="w-1/6" onClick={()=>  reiniciar()}>Voltar</Button>
+                        <h1 className="flex-1 text-center text-xl ">Você acertou: {acertos} de {resultado.length}</h1>
                         </div>
                         {resultado.map((p, i)=> (
-                            <div key={i} className={`border rounded-lg p-4 ${p.acertou ? 'border-green-500 bg-green-50' : `border-red-500 bg-red-50`}`}>
+                            <Card key={i} className={p.acertou ? 'border border-green-500 bg-green-50 ring-0' : 'border border-red-500 bg-red-50 ring-0'}>
+                                <CardContent className="text-lg px-1 py-3">
                                 <p>{p.enunciado}</p>
                                 <p>Sua resposta: {p.resposta_usuario}</p>
                                 {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
-                                </div>
+                                </CardContent>
+                                </Card>
                         ))}
-                        </div>
+                        </CardContent>
+                    </Card>
                 )}
-    
+
         </div>
         </>
-            
+
     )
 }
 export default Treino

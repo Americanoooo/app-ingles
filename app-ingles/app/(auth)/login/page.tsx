@@ -4,6 +4,10 @@ import { ApiError } from "@/lib/apiError";
 import { apiFetch } from "@/lib/apiFetch";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -51,33 +55,35 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-200">
-        
-        <div className="flex justify-center items-center w-1/2 md:w-1/5 h-100 rounded shadow bg-white text-lg px-3">
-        
+    <div className="min-h-screen flex items-center justify-center bg-slate-200 ">
+
+        <Card className="w-1/2 md:w-1/5 px-3 ">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl">{cadastrar === false ? "Login" : "Cadastro"}</CardTitle>
+          </CardHeader>
+          <CardContent>
           {cadastrar === false ? (
             <form className="flex flex-col gap-7 ">
-              <input className="w-full bg-transparent  placeholder:text-slate-400 text-slate-700  border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"  placeholder= "Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input  placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-              <input className="w-full bg-transparent  placeholder:text-slate-400 text-slate-700  border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow" placeholder= "Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+              <Input placeholder="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
 
 
-              <div className="flex flex-col gap-4"> 
+              <div className="flex flex-col gap-4">
                 {erro && (
                   <p className="text-red-500">{erro}</p>
                 )}
-                <button className="bg-blue-700 text-white p-2 rounded shadow cursor-pointer"
-                onClick={handleLogin}>Entrar</button>
-                <button className="bg-slate-200 p-2 rounded shadow cursor-pointer" onClick={()=> {setCadastrar(true); limparForm()}}>Cadastrar</button>
+                <Button onClick={handleLogin}>Entrar</Button>
+                <Button variant="outline" onClick={()=> {setCadastrar(true); limparForm()}}>Cadastrar</Button>
                 </div>
             </form>
           ) : (
             <form className="flex flex-col gap-5">
-              <input className="w-full bg-transparent  placeholder:text-slate-400 text-slate-700  border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow" placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
+              <Input placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
 
-              <input className="w-full bg-transparent  placeholder:text-slate-400 text-slate-700  border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow" placeholder= "Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-              <input className="w-full bg-transparent  placeholder:text-slate-400 text-slate-700  border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow" placeholder= "Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+              <Input placeholder="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
                 <div className="flex flex-col gap-4">
                   {erro && (
                   <p className="text-red-500">{erro}</p>
@@ -86,12 +92,13 @@ function Login() {
                 {sucesso && (
                   <p className="text-green-500">{sucesso}</p>
                 )}
-                <button className="bg-blue-700 text-white p-2 rounded shadow cursor-pointer" onClick={(handleCadastrar)}>Cadastrar </button>
-                <button className="bg-slate-200 p-2 rounded shadow cursor-pointer" onClick={()=> {setCadastrar(false); limparForm()}}>Voltar para o login</button>
+                <Button onClick={(handleCadastrar)}>Cadastrar</Button>
+                <Button variant="outline" onClick={()=> {setCadastrar(false); limparForm()}}>Voltar para o login</Button>
                 </div>
             </form>
           )}
-        </div>
+          </CardContent>
+        </Card>
     </div>
   );
 }

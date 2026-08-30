@@ -1,5 +1,5 @@
 import { ResultSetHeader } from "mysql2";
-import { pool } from "./db";
+import { getPool } from "./db";
 
 
 
@@ -19,7 +19,7 @@ interface Pergunta {
 }
 
 export async function salvarQuizCompleto(quizData: QuizData, perguntas: Pergunta[]) {
-  const conn = await pool.getConnection();
+  const conn = await getPool().getConnection();
   try{
     await conn.beginTransaction()
 

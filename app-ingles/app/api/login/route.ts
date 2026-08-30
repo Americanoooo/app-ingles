@@ -1,9 +1,10 @@
 import { login } from '@/lib/login.model'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../config'
+import { getJwtSecret } from '../config'
 import { error } from 'console'
 
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request){
     try{
@@ -21,7 +22,7 @@ export async function POST(req: Request){
         if(!certa){
             return Response.json({mensagem: 'Email ou senha inválidos'}, {status:401})
         }
-        const token = jwt.sign({usuario_id: usuario.id}, JWT_SECRET as string, {
+        const token = jwt.sign({usuario_id: usuario.id}, getJwtSecret() as string, {
             expiresIn: "24h",
         })
         return Response.json({mensagem: 'Usuario logado com sucesso', token}, {status:200})
