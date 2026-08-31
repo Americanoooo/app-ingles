@@ -1,4 +1,5 @@
 import { salvarQuizCompleto } from "@/lib/pergunta.model";
+import { erro500 } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ try{
     return Response.json({mensagem: 'Perguntas cadastradas com sucesso', perguntas: perguntas}, {status: 201})
 }catch(err:unknown){
                 const error = err instanceof Error ? err.message : 'Não foi possível cadastrar o quiz'
-                return Response.json({mensagem: 'Não foi possível cadastrar o quiz', error}, {status: 500})
+                console.error(error)
+                return erro500()
         }
 }

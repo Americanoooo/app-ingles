@@ -1,5 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { relatorio } from "@/lib/relatorio.model";
+import { erro500 } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,6 @@ export async function GET(req: Request){
         return Response.json({quizzes: resposta}, {status:200})
     }catch(err: unknown){
         console.error(err)
-        return Response.json({error: 'Erro ao listar quiz'}, {status:500})
+        return erro500()
     }
 }

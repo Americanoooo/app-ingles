@@ -1,3 +1,5 @@
+import { erro500 } from "@/lib/respostas";
+
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
@@ -58,6 +60,7 @@ export async function POST(req: Request) {
   return Response.json({quiz}, {status:200})
   }catch(err:unknown){
     const error = err instanceof Error ? err.message : 'Erro ao gerar quiz'
-    return Response.json({mensagem: 'Erro ao gerar quiz', error}, {status:500})
+    console.error(error)
+    return erro500()
   }
 }

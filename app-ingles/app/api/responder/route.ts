@@ -1,5 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { salvarQuizCompleto } from "@/lib/pergunta.model";
+import { erro500 } from "@/lib/respostas";
 import { z } from "zod";
 
 
@@ -48,7 +49,8 @@ export async function POST(req: Request){
             return Response.json({perguntasCorrigidas, acertou: nota}, {status:201})
     }catch(err:unknown){
         const error = err instanceof Error ? err.message : 'Erro ao salvar quiz'
-            return Response.json({mensagem: 'Não foi possível cadastrar o quiz', error}, {status:500})
+        console.error(error)    
+        return erro500()
     }
 
 

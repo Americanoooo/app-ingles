@@ -1,4 +1,5 @@
 import { cadastrarUsuario } from '@/lib/cadastrar.model'
+import { erro500 } from '@/lib/respostas';
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
@@ -43,6 +44,6 @@ export async function POST(req: Request){
         }
         console.log(err)
 
-        return Response.json({mensagem: 'Erro ao cadastrar usuário'}, {status: 500})
+        return erro500()
     }
 }

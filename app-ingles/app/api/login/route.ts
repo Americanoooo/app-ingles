@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { getJwtSecret } from '../config'
 import { error } from 'console'
+import { erro500 } from '@/lib/respostas'
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,6 @@ export async function POST(req: Request){
 
     }catch(err:unknown){
         console.log(error)
-        return Response.json({mensagem: 'Erro ao fazer login'}, {status:500})
+        return erro500()
     }
 }

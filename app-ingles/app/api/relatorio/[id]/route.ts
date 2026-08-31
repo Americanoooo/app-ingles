@@ -1,5 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { buscarRelatorioCompleto } from "@/lib/relatorioCompleto.model";
+import { erro500 } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,6 @@ export async function GET(req: Request, {params}:{params: Promise<{id: string}>}
     return Response.json({quizzes: resultado}, {status:200})
     }catch(err){
         console.error(err)
-        return Response.json({mensagem: 'Erro desconhecido'}, {status:500})
+        return erro500()
     }
 }

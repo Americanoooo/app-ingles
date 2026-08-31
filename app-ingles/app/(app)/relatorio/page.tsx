@@ -20,15 +20,38 @@ function Relatorio(){
     const [quiz, setQuiz]=useState<Quiz[]>([])
     const [carregando, setCarregando]= useState(true)
     const [filtroDificuldade, setFiltroDificuldade]=useState('Todas')
+    const [filtroPeriodo, setFiltroPeriodo] = useState("Todas");
 
 
-    const quizzesFiltrados = quiz.filter((q)=> filtroDificuldade === "Todas" ? true : q.dificuldade === Number(filtroDificuldade))
+
+    const quizzesFiltrados = quiz.filter((q)=> {
+        const passaDificuldade = 
+        filtroDificuldade === "Todas" ? true : q.dificuldade === Number(filtroDificuldade)
+        
+        let passaPeriodo = true
+        if(filtroPeriodo !== "Todas") {
+            const diasAtras = (new Date().getTime() - new Date(q.data). getTime()) / (1000 * 60 * 60 * 24)
+            if(filtroPeriodo === "7") passaPeriodo = diasAtras <=7
+            if(filtroPeriodo ==="30") passaPeriodo = diasAtras <=30
+      
+        }
+        return passaDificuldade && passaPeriodo
+    })
+
     const dificuldades = [
-        {label: "Todas", value: "Todas"},
+        {label: "Todas as dificuldades", value: "Todas"},
         {label: "Fácil", value:"1"},
         {label: "Média", value: "2" },
         {label: "Difícil", value: "3" },
     ]
+
+    const periodos = [
+        {label: 'Qualquer periodo', value:'Todas'},
+        {label: 'Últimos 7 dias', value:'7'},
+        {label: 'Últimos 30 dias', value:'30'}
+    ]
+
+   
 
     async function buscarQuiz(){
         try{
@@ -62,7 +85,7 @@ function Relatorio(){
         <Card className="w-full max-w-3xl">
         <CardHeader>
         <CardTitle className="text-2xl text-center">Relatório</CardTitle>
-        <div >
+        <div className="flex justify-center gap-5">
         <Select items={dificuldades} value={filtroDificuldade} onValueChange={(value)=> setFiltroDificuldade(value ?? "Todas")} >
             <SelectTrigger className="text-lg">
                 <SelectValue placeholder="Dificuldade"/>
@@ -73,6 +96,19 @@ function Relatorio(){
                     ))}
             </SelectContent>
         </Select>
+        
+
+          <Select items={periodos} value={filtroPeriodo} onValueChange={(value)=> setFiltroPeriodo(value ?? "Todas")} >
+            <SelectTrigger className="text-lg">
+                <SelectValue placeholder="Período"/>
+            </SelectTrigger>
+                <SelectContent className="text-lg ">
+                    {periodos.map((d)=> (
+                        <SelectItem key={d.value} value={d.value}> {d.label}</SelectItem>
+                    ))}
+            </SelectContent>
+        </Select>
+
           </div>
         </CardHeader>
 
