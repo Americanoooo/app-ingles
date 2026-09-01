@@ -10,6 +10,7 @@ export function Navbar(){
 
     async function handleLogout(){
       await apiFetch("api/logout", {method:"POST"})
+      window.location.href = "/login";    
     }
 
     return(
@@ -20,7 +21,7 @@ export function Navbar(){
         <Link href="/treino" className="hover:text-slate-300 transition">Início</Link>
         <Link href="/relatorio" className="hover:text-slate-300 transition">Relatório</Link>
         <Button
-          onClick={() => { handleLogout(); router.push('/login'); }}
+          onClick={() => handleLogout()}
           variant="destructive"
         >
           Sair

@@ -1,6 +1,5 @@
 import { login } from '@/lib/login.model'
 import bcrypt from 'bcrypt'
-import { error } from 'console'
 import { erro500 } from '@/lib/respostas'
 import { createSession } from '@/lib/session'
 
@@ -29,7 +28,7 @@ export async function POST(req: Request){
         return Response.json({mensagem: 'Usuario logado com sucesso'}, {status:200})
 
     }catch(err:unknown){
-        console.log(error)
+        console.log(err)
         return erro500()
     }
 }

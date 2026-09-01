@@ -1,9 +1,19 @@
+import { pegarUsuarioId } from "@/lib/auth";
 import { erro500 } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try{
+
+    try{
+      await pegarUsuarioId()
+    }catch{
+      return Response.json({mensagem: 'Acesso negado. Token inválido.'}, {status:401})
+    }
+
+
+
   const API_KEY = process.env.GEMINI_API_KEY;
   const { dificuldade, quantidade } = await req.json();
   if(!dificuldade || !quantidade || Number(quantidade) < 1){

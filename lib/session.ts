@@ -5,8 +5,8 @@ import { SignJWT, jwtVerify }  from 'jose';
 const {JWT_SECRET} = process.env
 const encodedKey = new TextEncoder().encode(JWT_SECRET);
 
-
-export async function encrypt(payload: any){
+type SessionPayload = {userId: string; expiresAt: Date}
+export async function encrypt(payload: SessionPayload){
     return await new SignJWT(payload)
     .setProtectedHeader({alg: "HS256"})
     .setIssuedAt()

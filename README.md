@@ -4,7 +4,7 @@ Aplicação **full-stack** de treino de inglês com quizzes gerados por **Inteli
 
 > 🔗 **Demo:** _(em breve)_
 
-![Tela de treino](docs/treino.png)
+![Tela de treino](docs/treino.PNG)
 
 ---
 
@@ -12,10 +12,18 @@ Aplicação **full-stack** de treino de inglês com quizzes gerados por **Inteli
 
 - **Autenticação completa** — cadastro e login com senha criptografada e sessão via **cookie httpOnly** (proteção contra XSS).
 - **Geração de quiz por IA** — o usuário escolhe a dificuldade (Fácil / Média / Difícil) e a quantidade de perguntas; a IA gera questões de múltipla escolha nas categorias *preposição*, *tempo verbal* e *contexto*.
+
+  ![Quiz gerado pela IA](docs/quiz.PNG)
+
 - **Correção automática** — a nota é calculada **no servidor** (o cliente nunca decide o resultado), com persistência atômica no banco.
 - **Tela de resultado** — mostra os acertos e destaca visualmente cada questão (verde para acerto, vermelho para erro) com a resposta correta.
+
+  ![Tela de resultado](docs/resultado.PNG)
+
 - **Histórico de quizzes** — relatório com todos os quizzes realizados, com **filtros** por dificuldade e por período.
 - **Revisão de quiz** — abre um quiz antigo e revê pergunta por pergunta o que foi respondido e o gabarito.
+
+  ![Revisão de quiz](docs/relatorio.PNG)
 
 ---
 
@@ -119,16 +127,17 @@ Alguns pontos de arquitetura que valem destaque:
 
 ```
 app/
-├── (auth)/          # telas públicas (login, cadastro)
-├── (app)/           # telas autenticadas (treino, relatório) + layout com navbar
+├── (auth)/          # tela pública de login/cadastro (mesma página, alterna entre os dois formulários)
+├── (app)/           # telas autenticadas (treino, relatório) + layout que aplica AuthGuard e Navbar
 │   └── ...
 ├── api/             # rotas de back-end (route handlers)
+├── components/      # AuthGuard (protege as rotas de (app)) e Navbar
 components/
 ├── ui/              # componentes shadcn/ui
 lib/                 # models, conexão com o banco, helpers
 schema.sql           # estrutura do banco
 docker-compose.yml   # orquestração app + MySQL
-Dockerfile
+dockerfile
 ```
 
 ---
