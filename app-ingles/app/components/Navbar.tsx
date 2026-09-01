@@ -3,9 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/apiFetch";
 
 export function Navbar(){
     const router = useRouter()
+
+    async function handleLogout(){
+      await apiFetch("api/logout", {method:"POST"})
+    }
 
     return(
     <nav className="flex justify-between items-center h-16 px-8 bg-slate-900 text-white shadow-md">
@@ -15,7 +20,7 @@ export function Navbar(){
         <Link href="/treino" className="hover:text-slate-300 transition">Início</Link>
         <Link href="/relatorio" className="hover:text-slate-300 transition">Relatório</Link>
         <Button
-          onClick={() => { localStorage.removeItem("token"); router.push('/login'); }}
+          onClick={() => { handleLogout(); router.push('/login'); }}
           variant="destructive"
         >
           Sair

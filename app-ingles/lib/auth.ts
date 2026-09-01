@@ -1,16 +1,18 @@
-import  jwt  from "jsonwebtoken"
-import { getJwtSecret} from "../app/api/config"
 
-export  function pegarUsuarioId(req: Request){
- 
-    const authHeader = req.headers.get('authorization')
-    const token = authHeader?.split(' ')[1]
-    if(!token){ 
-        throw new Error('Token não fornecido')
+import { cookies } from "next/headers"
+import { decrypt } from "./session"
+
+export async function pegarUsuarioId(): Promise<number>{
+    const cookieStore = await cookies()
+    const session = cookieStore.get('session')?.value
+
+    const payload = await decrypt(session)
+
+    if(!payload){
+        throw new Error('Não autenticado');
     }
 
-    const payload = jwt.verify(token, getJwtSecret() as string)
-    const {usuario_id} = payload as {usuario_id: number}
-    return usuario_id
+    return Number(payload.userId)
+
 }
 

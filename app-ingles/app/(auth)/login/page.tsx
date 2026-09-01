@@ -31,8 +31,7 @@ function Login() {
   async function handleLogin(e: React.FormEvent){
     e.preventDefault()
     try{
-      const data = await  apiFetch('/api/login', {method: 'POST', body: JSON.stringify({email, senha})})
-      localStorage.setItem(`token`, data.token)
+       await  apiFetch('/api/login', {method: 'POST', body: JSON.stringify({email, senha})})
       router.push('/treino')
       }catch(err){
         setErro(err instanceof ApiError ? err.message : 'Erro ao efetuar login')
@@ -43,7 +42,7 @@ function Login() {
   async function handleCadastrar(e: React.FormEvent){
     e.preventDefault()
     try{
-      const data = await apiFetch('/api/cadastrar',
+         await apiFetch('/api/cadastrar',
         {method: 'POST', body: JSON.stringify({nome, email,senha})}
       )
       setSucesso('Cadastro efetuado com sucesso')

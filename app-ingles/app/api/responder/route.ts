@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request){
     let usuario_id : number
     try{
-        usuario_id = pegarUsuarioId(req)
+        usuario_id = await pegarUsuarioId()
     }catch{
         return Response.json({mensagem: 'Acesso negado. Token inválido.'}, {status:401})
     }
