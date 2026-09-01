@@ -53,6 +53,8 @@ function QuizUnico(){
                         {quiz.map((p, indexPergunta)=> (
                             <div key={indexPergunta} className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3">
                             <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>
+                            <p className="text-lg font-medium capitalize">Categoria: {p.categoria.replace(/_/g, " ")}</p>
+
                             <div className={`flex flex-col border rounded-lg p-4 text-lg ${
                                 p.resposta_certa === p.resposta_usuario
                                 ? "border-green-500 bg-green-50"
