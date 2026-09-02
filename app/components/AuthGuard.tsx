@@ -11,7 +11,7 @@ export function AuthGuard({children}: {children: React.ReactNode}){
     useEffect(()=> {
         async function verificar(){
         try{
-            await apiFetch("api/me")
+            await apiFetch("/api/me")
             setOk(true)
         }catch{
             router.push('/login')

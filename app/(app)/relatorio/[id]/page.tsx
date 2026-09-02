@@ -106,7 +106,7 @@ function QuizUnico(){
                             <Dialog open={modalFeedback} onOpenChange={setModalFeedback}>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle className='text-center text-xl'>Explicação</DialogTitle>
+                                        <DialogTitle className='text-center text-xl'>Feedback</DialogTitle>
                                     </DialogHeader>
                                     {carregandoFeedback ? (
                                         <p className="text-lg text-center">Gerando explicação...</p>

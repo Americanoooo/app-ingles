@@ -4,7 +4,7 @@ import { decrypt } from "./session"
 
 export async function pegarUsuarioId(): Promise<number>{
     const cookieStore = await cookies()
-    const session = cookieStore.get('session')?.value
+    const session =  cookieStore.get('session')?.value
 
     const payload = await decrypt(session)
 
