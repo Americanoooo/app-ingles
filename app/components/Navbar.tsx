@@ -9,7 +9,7 @@ export function Navbar(){
     const router = useRouter()
 
     async function handleLogout(){
-      await apiFetch("api/logout", {method:"POST"})
+      await apiFetch("/api/logout", {method:"POST"})
       window.location.href = "/login";    
     }
 
