@@ -6,10 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-
-
+import {FeedbackButton} from "@/app/components/FeedbackButton"
 
    interface Quiz{
      enunciado:string, 
@@ -25,49 +22,20 @@ function QuizUnico(){
 
     const [quiz, setQuiz]=useState<Quiz[]>([])
     const [carregando, setCarregando]=useState(true)
-    const [carregandoFeedback, setCarregandoFeedback]= useState(true)
-    const [modalFeedback, setModalFeedback]=useState(false)
-    const [feedbacks, setFeedbacks]=useState<Record<number, string>>({})
-    const [perguntaAtiva, setPerguntaAtiva]= useState<number | null>(null)
+
+
 
   async  function buscarQuizUnico(){
     try{
         const data = await apiFetch(`/api/relatorio/${id}`)
         setQuiz(data.quizzes)
-         }catch(err){
-            console.error(err)
+         }catch{
          }finally{
             setCarregando(false)
          }
     }
 
-    async function handleFeedback(p: Quiz, indexPergunta: number){
-        setPerguntaAtiva(indexPergunta)
-        setModalFeedback(true)
-
-        if(feedbacks[indexPergunta]){
-            return;
-        }
-
-        setCarregandoFeedback(true)
-        try{
-            const data = await apiFetch('/api/feedback',
-                {method: 'POST',
-                    body: JSON.stringify({enunciado: p.enunciado,
-                        resposta_certa: p.resposta_certa,
-                        resposta_usuario: p.resposta_usuario,
-                        categoria: p.categoria,
-                    }),
-                })
-                setFeedbacks({...feedbacks, [indexPergunta]: data.explicacao})
-
-        }catch(err){
-            console.error(err)
-        }finally{
-            setCarregandoFeedback(false)
-        }
-
-    }
+   
 
     useEffect(()=> {
         buscarQuizUnico()
@@ -98,23 +66,12 @@ function QuizUnico(){
                                 <p>Resposta do usuário: {p.resposta_usuario}</p>
                                 </div>
 
-                               <Button className='w-1/4 mx-auto' onClick={()=> handleFeedback(p, indexPergunta)}>Feedback</Button>
+                               <FeedbackButton pergunta={p}/>
 
                             </div>
                             
                         ))}
-                            <Dialog open={modalFeedback} onOpenChange={setModalFeedback}>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle className='text-center text-xl'>Feedback</DialogTitle>
-                                    </DialogHeader>
-                                    {carregandoFeedback ? (
-                                        <p className="text-lg text-center">Gerando explicação...</p>
-                                    ): <p className="text-lg">{perguntaAtiva !== null ? feedbacks[perguntaAtiva]: ""}</p>
-                                    }
-                                </DialogContent>
-
-                            </Dialog>
+                           
                         </>
                 
                         )}

@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     const quiz = JSON.parse(data.choices[0].message.content );
       return Response.json({quiz}, {status:200})
     }catch(err:unknown){
-      const error = err instanceof Error ? err.message : 'Erro ao gerar quiz'
+      const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'
       console.error(error)
        return erro500()
     }

@@ -48,7 +48,6 @@ function Login() {
       setSucesso('Cadastro efetuado com sucesso')
       setErro('')
     }catch(err:unknown){
-      console.log(err)
       setErro( err instanceof  Error ? err.message : 'Erro ao cadastrar')
     }
   }

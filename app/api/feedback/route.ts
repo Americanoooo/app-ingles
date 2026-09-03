@@ -65,6 +65,6 @@ export async function POST(req: Request){
 
     }catch(err: unknown){
         console.error(err)
-        return erro500
+        return erro500()
     }
 }
