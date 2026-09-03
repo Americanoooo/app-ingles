@@ -6,8 +6,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
-
-
+import {FeedbackButton} from "@/app/components/FeedbackButton"
 
    interface Quiz{
      enunciado:string, 
@@ -24,16 +23,19 @@ function QuizUnico(){
     const [quiz, setQuiz]=useState<Quiz[]>([])
     const [carregando, setCarregando]=useState(true)
 
+
+
   async  function buscarQuizUnico(){
     try{
         const data = await apiFetch(`/api/relatorio/${id}`)
         setQuiz(data.quizzes)
-         }catch(err){
-            console.error(err)
+         }catch{
          }finally{
             setCarregando(false)
          }
     }
+
+   
 
     useEffect(()=> {
         buscarQuizUnico()
@@ -64,10 +66,14 @@ function QuizUnico(){
                                 <p>Resposta do usuário: {p.resposta_usuario}</p>
                                 </div>
 
+                               <FeedbackButton pergunta={p}/>
 
                             </div>
+                            
                         ))}
+                           
                         </>
+                
                         )}
 
             </CardContent>

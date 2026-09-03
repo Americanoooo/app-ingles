@@ -2,7 +2,7 @@ services:
   db:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: senha1234
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: app_ingles
     ports:
       - "3307:3306" 
@@ -23,7 +23,7 @@ services:
     environment:
       DB_HOST: db
       DB_USER: root
-      DB_PASSWORD: senha1234
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: app_ingles
       DB_PORT: 3306
       JWT_SECRET: ${JWT_SECRET}

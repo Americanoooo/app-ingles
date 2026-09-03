@@ -1,14 +1,26 @@
+import { pegarUsuarioId } from "@/lib/auth";
 import { erro500 } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try{
-  const API_KEY = process.env.GEMINI_API_KEY;
+
+    try{
+      await pegarUsuarioId()
+    }catch{
+      return Response.json({mensagem: 'Acesso negado. Token inválido.'}, {status:401})
+    }
+
+
+
   const { dificuldade, quantidade } = await req.json();
   if(!dificuldade || !quantidade || Number(quantidade) < 1){
     return Response.json({error: "Dificuldade e quantidade são obrigatórias"}, {status:400})
   }
+
+  const API_KEY = process.env.GEMINI_API_KEY;
+
   const resposta = await fetch(
     "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     {
@@ -55,12 +67,15 @@ export async function POST(req: Request) {
       }),
     },
   );
-  const data = await resposta.json();
-  const quiz = JSON.parse(data.choices[0].message.content );
-  return Response.json({quiz}, {status:200})
-  }catch(err:unknown){
-    const error = err instanceof Error ? err.message : 'Erro ao gerar quiz'
-    console.error(error)
-    return erro500()
+  if(!resposta.ok){
+    throw new Error(`Erro na API: ${resposta.status} - ${resposta.statusText}`);
   }
-}
+    const data = await resposta.json();
+    const quiz = JSON.parse(data.choices[0].message.content );
+      return Response.json({quiz}, {status:200})
+    }catch(err:unknown){
+      const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'
+      console.error(error)
+       return erro500()
+    }
+  }

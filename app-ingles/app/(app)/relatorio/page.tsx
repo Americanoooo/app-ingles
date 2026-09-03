@@ -57,9 +57,7 @@ function Relatorio(){
         try{
             const data = await apiFetch('/api/relatorio',)
             setQuiz(data.quizzes)
-            console.log(data.quizzes)
-        }catch(err){
-            console.error(err)
+        }catch{
         }finally{
             setCarregando(false)
         }

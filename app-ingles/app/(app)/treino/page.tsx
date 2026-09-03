@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { FeedbackButton } from "@/app/components/FeedbackButton";
+
 
     interface Pergunta {
         enunciado:string,
@@ -40,8 +42,6 @@ function Treino(){
     const [erro, setErro]=useState('')
 
 
-
-
    async function handleQuiz(){
         if(!dificuldade || !quantidade || Number(quantidade) < 1) return setErro('Preencha todos os campos')
     setCarregando(true)
@@ -51,12 +51,10 @@ function Treino(){
             body: JSON.stringify({dificuldade, quantidade})}
         )
         setPerguntas(data.quiz)
-        console.log(data.quiz)
         setTela('quiz')
 
-        }catch(err:unknown){
-            console.log(err)
-            setErro('Erro ao gerar quiz')
+        }catch{
+            setErro('Erro interno, tente novamente.')
         }finally{
             setCarregando(false)
 
@@ -76,14 +74,14 @@ function Treino(){
                 }
             )
 
-            console.log(data)
-                setResultado(data.perguntasCorrigidas)
+            setResultado(data.perguntasCorrigidas)
                 setAcertos(data.acertou)
                 setTela('resultado')
-        }catch(err){
-            console.error(err)
+        }catch{
         }
     }
+
+    
 
     function reiniciar(){
         setTela("setup");
@@ -180,16 +178,26 @@ function Treino(){
                             <Card key={i} className={p.acertou ? 'border border-green-500 bg-green-50 ring-0' : 'border border-red-500 bg-red-50 ring-0'}>
                                 <CardContent className="text-lg px-1 py-3">
                                 <p>{p.enunciado}</p>
+                                <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
+
                                 <p>Sua resposta: {p.resposta_usuario}</p>
                                 {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
+                               
+                                <div className="flex justify-center mx-auto ">
+                                <FeedbackButton pergunta={p}/>
+                                </div>
+
                                 </CardContent>
                                 </Card>
                         ))}
                         </CardContent>
                     </Card>
+                    
                 )}
+                
 
         </div>
+       
         </>
 
     )
