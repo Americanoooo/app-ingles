@@ -183,9 +183,7 @@ function Treino(){
                                 <p>Sua resposta: {p.resposta_usuario}</p>
                                 {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
                                
-                                <div className="flex justify-center mx-auto ">
                                 <FeedbackButton pergunta={p}/>
-                                </div>
 
                                 </CardContent>
                                 </Card>
