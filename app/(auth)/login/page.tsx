@@ -53,9 +53,9 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-200 ">
+    <div className="min-h-screen flex items-center justify-center bg-slate-200 p-4">
 
-        <Card className="w-1/2 md:w-1/5 px-3 ">
+        <Card className="w-full max-w-sm px-3">
           <CardHeader>
             <CardTitle className="text-center text-2xl">{cadastrar === false ? "Login" : "Cadastro"}</CardTitle>
           </CardHeader>

@@ -43,7 +43,7 @@ function QuizUnico(){
 
 
     return (
-        <div className="min-h-screen bg-slate-200 flex flex-col items-center justify-center">
+        <div className="min-h-screen bg-slate-200 flex flex-col items-center justify-center gap-4 p-4">
             <Card className="w-full max-w-3xl">
             <CardContent className="flex flex-col gap-10 justify-start min-h-100 max-h-150 overflow-y-auto">
             {carregando ===true ?(

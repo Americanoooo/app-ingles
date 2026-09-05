@@ -50,8 +50,8 @@ export function FeedbackButton({pergunta}: FeedbackProps){
     }
     return(
         <>
-        <div className="flex justify-center"> 
-        <Button className="w-1/3 justify" onClick={handleFeedback}>Feedback</Button>
+        <div className="flex justify-center">
+        <Button className="w-full sm:w-auto sm:min-w-32" onClick={handleFeedback}>Feedback</Button>
         </div>
         <Dialog open={aberto} onOpenChange={setAberto}>
             <DialogContent className="text-xl">
