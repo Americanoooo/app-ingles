@@ -1,6 +1,6 @@
 import { login } from '@/lib/login.model'
 import bcrypt from 'bcrypt'
-import { erro500 } from '@/lib/respostas'
+import { internalServerError } from '@/lib/respostas'
 import { createSession } from '@/lib/session'
 
 
@@ -18,7 +18,7 @@ export async function POST(req: Request){
             return Response.json({mensagem: 'Email ou senha inválidos'}, {status:401})
         }
 
-        const certa = await bcrypt.compare(senha, usuario.senha_hash)
+        const certa = await bcrypt.compare(senha, usuario.senhaHash)
         if(!certa){
             return Response.json({mensagem: 'Email ou senha inválidos'}, {status:401})
         }
@@ -29,6 +29,6 @@ export async function POST(req: Request){
 
     }catch(err:unknown){
         console.log(err)
-        return erro500()
+        return internalServerError()
     }
 }

@@ -1,19 +1,10 @@
-import { pegarUsuarioId } from "@/lib/auth";
-import { erro500 } from "@/lib/respostas";
+import {internalServerError } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try{
-
-    try{
-      await pegarUsuarioId()
-    }catch{
-      return Response.json({mensagem: 'Acesso negado. Token inválido.'}, {status:401})
-    }
-
-
-
+    
   const { dificuldade, quantidade } = await req.json();
   if(!dificuldade || !quantidade || Number(quantidade) < 1){
     return Response.json({error: "Dificuldade e quantidade são obrigatórias"}, {status:400})
@@ -52,13 +43,13 @@ export async function POST(req: Request) {
                     enum: ["preposicao", "tempo_verbal", "contexto"],
                   },
                   opcoes: { type: "array", items: { type: "string" } },
-                  resposta_certa: { type: "string" },
+                  respostaCerta: { type: "string" },
                 },
                 required: [
                   "enunciado",
                   "categoria",
                   "opcoes",
-                  "resposta_certa",
+                  "respostaCerta",
                 ],
               },
             },
@@ -76,6 +67,6 @@ export async function POST(req: Request) {
     }catch(err:unknown){
       const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'
       console.error(error)
-       return erro500()
+       return internalServerError()
     }
   }

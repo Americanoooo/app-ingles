@@ -13,6 +13,6 @@ export async function pegarUsuarioId(): Promise<number>{
     }
 
     return Number(payload.userId)
-
+    
 }
 

@@ -6,5 +6,13 @@ export async function login(email:string){
         'SELECT * FROM usuario WHERE email =?',
         [email]
     )
-    return resultado[0]
+    const usuario = resultado[0]
+    if(!usuario) return usuario
+
+    return {
+        id: usuario.id,
+        email: usuario.email,
+        nome: usuario.nome,
+        senhaHash: usuario.senha_hash,
+    }
 }

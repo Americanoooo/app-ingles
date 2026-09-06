@@ -1,17 +1,11 @@
 import { pegarUsuarioId } from "@/lib/auth";
-import { erro500 } from "@/lib/respostas";
+import { internalServerError } from "@/lib/respostas";
 
 
 export async function POST(req: Request){
     try{
-    try{
-         await pegarUsuarioId()
-    }catch{
-      return Response.json({mensagem: 'Acesso negado. Token inválido.'}, {status:401})
-    }
-    
-    const {enunciado, resposta_usuario, resposta_certa, categoria}= await req.json();
-        if(!enunciado || !resposta_usuario|| !resposta_certa || !categoria){
+    const {enunciado, respostaUsuario, respostaCerta, categoria}= await req.json();
+        if(!enunciado || !respostaUsuario|| !respostaCerta || !categoria){
             return Response.json({mensagem: 'Dados incompletos'}, {status:400})
         }
         const API_KEY = process.env.GEMINI_API_KEY;
@@ -35,8 +29,8 @@ export async function POST(req: Request){
                         role: 'user',
                         content: `Um aluno respondeu uma questão de inglês sobre ${categoria}.
                                     Pergunta: "${enunciado}"
-                                    Resposta correta: "${resposta_certa}"
-                                    Resposta do aluno: "${resposta_usuario}"
+                                    Resposta correta: "${respostaCerta}"
+                                    Resposta do aluno: "${respostaUsuario}"
 
                                     Se o aluno acertou, confirme e explique por que está correto. Se errou, explique por que a resposta correta é a certa e por que a dele não serve. Responda em português, de forma simples e didática.`
                     },
@@ -65,6 +59,6 @@ export async function POST(req: Request){
 
     }catch(err: unknown){
         console.error(err)
-        return erro500()
+        return internalServerError()
     }
 }

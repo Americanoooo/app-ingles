@@ -1,4 +1,4 @@
-import { erro500 } from "@/lib/respostas";
+import { internalServerError } from "@/lib/respostas";
 import { cookies } from "next/headers";
 
 
@@ -8,6 +8,6 @@ export async function POST(){
     cookieStore.delete('session');
     return Response.json({mensagem: 'Deslogado'}, {status:200})
     }catch{
-        return erro500()
+        return internalServerError()
     }
 }

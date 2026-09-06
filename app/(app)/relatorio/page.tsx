@@ -8,11 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
     interface Quiz{
         id: number,
-        usuario_id: number,
+        usuarioId: number,
         dificuldade: number,
         nota: number,
         data: string,
-        total_perguntas: number
+        totalPerguntas: number
     }
 
 
@@ -128,8 +128,8 @@ function Relatorio(){
                             <p>Dificuldade: {converterDificuldade(q.dificuldade)}</p>
                     <p className="text-lg">{new Date(q.data).toLocaleDateString('pt-BR')}</p>
                     </div>
-                    <h2>Quantidade de perguntas: {q.total_perguntas} - Acertos: {q.nota}</h2>
-                    <h2>Nota: {q.nota / q.total_perguntas}</h2>
+                    <h2>Quantidade de perguntas: {q.totalPerguntas} - Acertos: {q.nota}</h2>
+                    <h2>Nota: {q.nota / q.totalPerguntas}</h2>
                     </CardContent>
                     </Card>
                 </Link>

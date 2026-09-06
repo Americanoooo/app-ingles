@@ -9,11 +9,11 @@ import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
 
    interface Quiz{
-     enunciado:string, 
+     enunciado:string,
         categoria: string,
         opcoes:string[],
-        resposta_certa:string,
-        resposta_usuario: string
+        respostaCerta:string,
+        respostaUsuario: string
     }
 
 function QuizUnico(){
@@ -58,12 +58,12 @@ function QuizUnico(){
                             <p className="text-lg font-medium capitalize">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
                             <div className={`flex flex-col border rounded-lg p-4 text-lg ${
-                                p.resposta_certa === p.resposta_usuario
+                                p.respostaCerta === p.respostaUsuario
                                 ? "border-green-500 bg-green-50"
                                 : "border-red-500 bg-red-50"
                                 }`}>
-                                <p>Resposta correta: {p.resposta_certa}</p>
-                                <p>Resposta do usuário: {p.resposta_usuario}</p>
+                                <p>Resposta correta: {p.respostaCerta}</p>
+                                <p>Resposta do usuário: {p.respostaUsuario}</p>
                                 </div>
 
                                <FeedbackButton pergunta={p}/>

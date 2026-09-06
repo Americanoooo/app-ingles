@@ -12,12 +12,12 @@ import { FeedbackButton } from "@/app/components/FeedbackButton";
         enunciado:string,
         categoria: string,
         opcoes:string[],
-        resposta_certa:string,
+        respostaCerta:string,
     }
 
     interface Resultado{
-        resposta_certa: string,
-        resposta_usuario: string,
+        respostaCerta: string,
+        respostaUsuario: string,
         enunciado: string,
         categoria: string,
         opcoes:string[],
@@ -65,7 +65,7 @@ function Treino(){
         try{
             const respostasQuiz = perguntas.map((p, indexPergunta)=> ({
                 ...p,
-                resposta_usuario: respostas[indexPergunta]
+                respostaUsuario: respostas[indexPergunta]
             }))
 
             const data = await apiFetch('/api/responder',
@@ -180,8 +180,8 @@ function Treino(){
                                 <p>{p.enunciado}</p>
                                 <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
-                                <p>Sua resposta: {p.resposta_usuario}</p>
-                                {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
+                                <p>Sua resposta: {p.respostaUsuario}</p>
+                                {!p.acertou && <p>Resposta certa: {p.respostaCerta}</p>}
                                
                                 <FeedbackButton pergunta={p}/>
 
