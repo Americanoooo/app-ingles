@@ -129,7 +129,7 @@ function Relatorio(){
                     <p className="text-lg">{new Date(q.data).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <h2>Quantidade de perguntas: {q.totalPerguntas} - Acertos: {q.nota}</h2>
-                    <h2>Nota: {q.nota / q.totalPerguntas}</h2>
+                    <h2>Nota: {(q.nota / q.totalPerguntas).toFixed(2)}</h2>
                     </CardContent>
                     </Card>
                 </Link>

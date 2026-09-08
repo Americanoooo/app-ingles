@@ -1,6 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { salvarQuizCompleto } from "@/lib/pergunta.model";
-import { badRequest, internalServerError } from "@/lib/respostas";
+import { badRequest, calcularNota, internalServerError } from "@/lib/respostas";
 import { z } from "zod";
 
 
@@ -36,6 +36,9 @@ export async function POST(req: Request){
         ...p,
         acertou: p.respostaCerta === p.respostaUsuario,
     }));
+
+
+
 
     const nota =  perguntasCorrigidas.filter((r)=> r.acertou).length
     const quizData = {usuarioId, dificuldade, nota};
