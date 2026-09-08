@@ -79,7 +79,7 @@ export async function POST(req: Request){
 
         if(!resultadoZod.success){
             console.error("Zod falhou ao validar o formato da IA:", resultadoZod)
-            return internalServerError
+            return internalServerError()
         }
 
 
