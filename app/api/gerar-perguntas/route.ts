@@ -1,6 +1,19 @@
 import { badRequest, internalServerError } from "@/lib/respostas";
+import * as z from "zod"; 
+
 
 export const dynamic = "force-dynamic";
+
+const RespostaIA= z.array(
+    z.object({
+      enunciado: z.string(), 
+      categoria: z.enum(["preposicao", "tempo_verbal", "contexto"]), 
+      opcoes: z.array(z.string()), 
+          respostaCerta: z.string()
+
+    }),
+);
+
 
 export async function POST(req: Request) {
   try{
@@ -32,6 +45,7 @@ export async function POST(req: Request) {
           type: "json_schema",
           json_schema: {
             name: "quiz",
+            strict: true,
             schema: {
               type: "array",
               items: {
@@ -51,6 +65,7 @@ export async function POST(req: Request) {
                   "opcoes",
                   "respostaCerta",
                 ],
+                additionalProperties: false,
               },
             },
           },
@@ -61,9 +76,31 @@ export async function POST(req: Request) {
   if(!resposta.ok){
     throw new Error(`Erro na API: ${resposta.status} - ${resposta.statusText}`);
   }
+
     const data = await resposta.json();
-    const quiz = JSON.parse(data.choices[0].message.content );
-      return Response.json({quiz}, {status:200})
+    const quizIA = data.choices[0].message.content
+     if(!quizIA){
+            console.error("O modelo retornou um conteúdo vazio.");
+            return internalServerError();
+        }
+      let quizValidado: unknown
+        try{
+          quizValidado = JSON.parse(quizIA)
+
+        }catch(err:unknown){
+            console.error("Falha ao parsear string JSON da IA:", quizIA)
+            return internalServerError()
+        }
+
+        const quiz = await RespostaIA.safeParseAsync(quizValidado)
+
+        if(!quiz.success){
+              console.error("Zod falhou ao validar o formato da IA:", quiz)
+              return internalServerError()
+          
+        }
+
+      return Response.json(quiz.data, {status:200})
     }catch(err:unknown){
       const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'
       console.error(error)

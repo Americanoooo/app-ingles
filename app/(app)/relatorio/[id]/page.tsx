@@ -28,7 +28,8 @@ function QuizUnico(){
   async  function buscarQuizUnico(){
     try{
         const data = await apiFetch(`/api/relatorio/${id}`)
-        setQuiz(data.quizzes)
+        setQuiz(data.listaPerguntas)
+        
          }catch{
          }finally{
             setCarregando(false)

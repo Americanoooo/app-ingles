@@ -50,7 +50,7 @@ function Treino(){
             {method:'POST',
             body: JSON.stringify({dificuldade, quantidade})}
         )
-        setPerguntas(data.quiz)
+        setPerguntas(data)
         setTela('quiz')
 
         }catch{

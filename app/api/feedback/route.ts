@@ -42,12 +42,14 @@ export async function POST(req: Request){
                     type: 'json_schema',
                     json_schema: {
                         name: 'feedback',
+                        strict: true,
                         schema: {
                             type:'object',
                             properties: {
                                 explicacao: {type: 'string'}
                             },
-                            required: ['explicacao']
+                            required: ['explicacao'],
+                            additionalProperties: false
                         }
                     }
                 }
@@ -75,7 +77,7 @@ export async function POST(req: Request){
 
         const resultadoZod = await RespostaIA.safeParseAsync(jsonValidado)
 
-        if(!resultadoZod){
+        if(!resultadoZod.success){
             console.error("Zod falhou ao validar o formato da IA:", resultadoZod)
             return internalServerError
         }
