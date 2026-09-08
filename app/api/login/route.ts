@@ -1,6 +1,6 @@
 import { login } from '@/lib/login.model'
 import bcrypt from 'bcrypt'
-import { internalServerError } from '@/lib/respostas'
+import { badRequest, internalServerError, unauthorized } from '@/lib/respostas'
 import { createSession } from '@/lib/session'
 
 
@@ -10,17 +10,17 @@ export async function POST(req: Request){
     try{
         const {email, senha} = await req.json()
         if(!email || !senha){
-            return Response.json({mensagem: 'Insira dados válidos'}, {status: 400})
+            return badRequest()
         }
 
         const usuario = await login(email)
         if(!usuario){
-            return Response.json({mensagem: 'Email ou senha inválidos'}, {status:401})
+            return unauthorized()
         }
 
         const certa = await bcrypt.compare(senha, usuario.senhaHash)
         if(!certa){
-            return Response.json({mensagem: 'Email ou senha inválidos'}, {status:401})
+            return unauthorized()
         }
         
         await createSession(String(usuario.id))

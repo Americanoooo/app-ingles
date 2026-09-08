@@ -1,6 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { salvarQuizCompleto } from "@/lib/pergunta.model";
-import { internalServerError } from "@/lib/respostas";
+import { badRequest, internalServerError } from "@/lib/respostas";
 import { z } from "zod";
 
 
@@ -29,8 +29,7 @@ export async function POST(req: Request){
 
        const parse = responderSchema.safeParse( await req.json());
        if(!parse.success)
-        return Response.json({mensagem: 'Dados inválidos', erros: parse.error.issues},
-    {status: 400})
+        return badRequest()
     const {dificuldade, respostaQuiz} = parse.data
 
     const perguntasCorrigidas = respostaQuiz.map((p)=> ({

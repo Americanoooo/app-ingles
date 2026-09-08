@@ -1,4 +1,4 @@
-import {internalServerError } from "@/lib/respostas";
+import { badRequest, internalServerError } from "@/lib/respostas";
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     
   const { dificuldade, quantidade } = await req.json();
   if(!dificuldade || !quantidade || Number(quantidade) < 1){
-    return Response.json({error: "Dificuldade e quantidade são obrigatórias"}, {status:400})
+    return badRequest()
   }
 
   const API_KEY = process.env.GEMINI_API_KEY;

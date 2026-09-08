@@ -1,5 +1,5 @@
 import { cadastrarUsuario } from '@/lib/cadastrar.model'
-import { internalServerError } from '@/lib/respostas';
+import { badRequest, internalServerError } from '@/lib/respostas';
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
@@ -28,9 +28,7 @@ export async function POST(req: Request){
         const validacao = cadastrarSchema.safeParse(body)
 
         if(!validacao.success) {
-            const erroFormatado = z.flattenError(validacao.error)
-            const mensagens = Object.values(erroFormatado.fieldErrors).flat()
-            return Response.json({error: mensagens[0]}, {status:400})
+            return badRequest()
         }
 
         const { email, nome, senha } = validacao.data

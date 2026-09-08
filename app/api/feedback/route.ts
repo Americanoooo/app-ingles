@@ -1,12 +1,15 @@
-import { pegarUsuarioId } from "@/lib/auth";
-import { internalServerError } from "@/lib/respostas";
+import * as z from "zod"; 
+import { badRequest, internalServerError } from "@/lib/respostas";
 
+const RespostaIA = z.object({
+    explicacao: z.string()
+})
 
 export async function POST(req: Request){
     try{
     const {enunciado, respostaUsuario, respostaCerta, categoria}= await req.json();
         if(!enunciado || !respostaUsuario|| !respostaCerta || !categoria){
-            return Response.json({mensagem: 'Dados incompletos'}, {status:400})
+            return badRequest()
         }
         const API_KEY = process.env.GEMINI_API_KEY;
 
@@ -50,15 +53,39 @@ export async function POST(req: Request){
                 }
             })
         })
+        
         if(!resposta.ok){
              throw new Error(`Erro na API: ${resposta.status} - ${resposta.statusText}`);
         }
         const data = await resposta.json()
-        const respostaFeedback = JSON.parse(data.choices[0].message.content)
-        return Response.json(respostaFeedback, {status:200})
+        const respostaFeedback = data.choices?.[0]?.message?.content;
+
+        if(!respostaFeedback){
+            console.error("O modelo retornou um conteúdo vazio.");
+            return internalServerError();
+        }
+
+        let jsonValidado: unknown
+        try{
+            jsonValidado = JSON.parse(respostaFeedback);
+        }catch(err: unknown){
+            console.error("Falha ao parsear string JSON da IA:", respostaFeedback)
+            return internalServerError()
+        }
+
+        const resultadoZod = await RespostaIA.safeParseAsync(jsonValidado)
+
+        if(!resultadoZod){
+            console.error("Zod falhou ao validar o formato da IA:", resultadoZod)
+            return internalServerError
+        }
+
+
+        return Response.json(resultadoZod.data, {status:200})
+       
 
     }catch(err: unknown){
-        console.error(err)
+        console.error("Erro crítico na Route Handler:", err)
         return internalServerError()
     }
 }

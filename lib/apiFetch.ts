@@ -16,7 +16,7 @@ export async function apiFetch (endpoint:string, options: RequestInit = {}){
     const data = await res.json()
 
     if(!res.ok){
-        throw new ApiError(res.status, data.error || data.mensagem || data.message || 'Erro na requisição')
+        throw new ApiError(res.status, data.mensagem || 'Erro na requisição')
     }
     return data
 
