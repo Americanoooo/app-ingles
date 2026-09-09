@@ -43,8 +43,10 @@ function Treino(){
 
 
    async function handleQuiz(){
+            if(Number(quantidade) > 10 || Number(quantidade) < 1) return setErro('Escolha entre 1 e 10 perguntas.')
+
         if(!dificuldade || !quantidade || Number(quantidade) < 1) return setErro('Preencha todos os campos')
-    setCarregando(true)
+            setCarregando(true)
         try{
         const data = await apiFetch('/api/gerar-perguntas',
             {method:'POST',
@@ -124,7 +126,8 @@ function Treino(){
                     value={quantidade}
                     onChange={(e)=> setQuantidade(e.target.value)}
                     type="number"
-                    min={1}/>
+                    min={1}
+                    max={10}/>
 
                 </div>
                 {erro && <p className="text-red-500 text-center">{erro}</p>}
