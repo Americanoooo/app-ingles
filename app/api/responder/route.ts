@@ -39,12 +39,12 @@ export async function POST(req: Request){
 
 
 
-
-    const nota =  perguntasCorrigidas.filter((r)=> r.acertou).length
-    const quizData = {usuarioId, dificuldade, nota};
+    const acertou =  perguntasCorrigidas.filter((r)=> r.acertou).length
+    const notaCalculada = calcularNota(acertou, respostaQuiz.length)
+    const quizData = {usuarioId, dificuldade, notaCalculada};
     
         await salvarQuizCompleto(quizData, perguntasCorrigidas)
-            return Response.json({perguntasCorrigidas, acertou: nota}, {status:201})
+            return Response.json({perguntasCorrigidas, acertou}, {status:201})
     }catch(err:unknown){
         const error = err instanceof Error ? err.message : 'Erro ao salvar quiz'
         console.error(error)    

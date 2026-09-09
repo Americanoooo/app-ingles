@@ -6,7 +6,7 @@ import { getPool } from "./db";
 interface QuizData {
   usuarioId: number,
   dificuldade: number,
-  nota: number
+  notaCalculada: number 
 }
 
 interface Pergunta {
@@ -26,7 +26,7 @@ export async function salvarQuizCompleto(quizData: QuizData, perguntas: Pergunta
 
   const [quiz] = await conn.query<ResultSetHeader>(
     "INSERT INTO quiz (usuario_id, dificuldade, nota, data, total_perguntas) VALUES (?,?,?,CURDATE(), ?)",
-    [quizData.usuarioId, quizData.dificuldade, quizData.nota, perguntas.length],
+    [quizData.usuarioId, quizData.dificuldade, quizData.notaCalculada, perguntas.length],
   );
 
 

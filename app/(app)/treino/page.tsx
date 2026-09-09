@@ -176,7 +176,7 @@ function Treino(){
                         </div>
                         {resultado.map((p, i)=> (
                             <Card key={i} className={p.acertou ? 'border border-green-500 bg-green-50 ring-0' : 'border border-red-500 bg-red-50 ring-0'}>
-                                <CardContent className="text-lg px-1 py-3">
+                                <CardContent className="flex flex-col gap-1 text-lg px-3 py-2">
                                 <p>{p.enunciado}</p>
                                 <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
