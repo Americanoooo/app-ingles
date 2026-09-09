@@ -6,10 +6,10 @@ import { apiFetch } from "@/lib/apiFetch";
 import { useState } from "react";
 
 interface Pergunta{
-     enunciado:string, 
+     enunciado:string,
         categoria: string,
-        resposta_certa:string,
-        resposta_usuario: string
+        respostaCerta:string,
+        respostaUsuario: string
     }
 
     interface FeedbackProps{
@@ -35,8 +35,8 @@ export function FeedbackButton({pergunta}: FeedbackProps){
                 method:"POST",
                 body: JSON.stringify({
                     enunciado: pergunta.enunciado,
-                    resposta_certa: pergunta.resposta_certa,
-                    resposta_usuario:pergunta.resposta_usuario,
+                    respostaCerta: pergunta.respostaCerta,
+                    respostaUsuario:pergunta.respostaUsuario,
                     categoria: pergunta.categoria
                 }),
             });
@@ -50,8 +50,8 @@ export function FeedbackButton({pergunta}: FeedbackProps){
     }
     return(
         <>
-        <div className="flex justify-center"> 
-        <Button className="w-1/3 justify" onClick={handleFeedback}>Feedback</Button>
+        <div className="flex justify-center">
+        <Button className="w-full sm:w-auto sm:min-w-32" onClick={handleFeedback}>Feedback</Button>
         </div>
         <Dialog open={aberto} onOpenChange={setAberto}>
             <DialogContent className="text-xl">

@@ -8,11 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
     interface Quiz{
         id: number,
-        usuario_id: number,
+        usuarioId: number,
         dificuldade: number,
         nota: number,
         data: string,
-        total_perguntas: number
+        totalPerguntas: number
     }
 
 
@@ -79,13 +79,13 @@ function Relatorio(){
 
     return(
         <>
-        <div className="min-h-screen bg-slate-200 flex items-center justify-center">
+        <div className="min-h-screen bg-slate-200 flex items-center justify-center p-4">
         <Card className="w-full max-w-3xl">
         <CardHeader>
         <CardTitle className="text-2xl text-center">Relatório</CardTitle>
-        <div className="flex justify-center gap-5">
+        <div className="flex flex-col sm:flex-row sm:justify-center gap-3 sm:gap-5">
         <Select items={dificuldades} value={filtroDificuldade} onValueChange={(value)=> setFiltroDificuldade(value ?? "Todas")} >
-            <SelectTrigger className="text-lg">
+            <SelectTrigger className="text-lg w-full sm:w-56">
                 <SelectValue placeholder="Dificuldade"/>
             </SelectTrigger>
                 <SelectContent className="text-lg ">
@@ -94,10 +94,10 @@ function Relatorio(){
                     ))}
             </SelectContent>
         </Select>
-        
+
 
           <Select items={periodos} value={filtroPeriodo} onValueChange={(value)=> setFiltroPeriodo(value ?? "Todas")} >
-            <SelectTrigger className="text-lg">
+            <SelectTrigger className="text-lg w-full sm:w-56">
                 <SelectValue placeholder="Período"/>
             </SelectTrigger>
                 <SelectContent className="text-lg ">
@@ -124,12 +124,12 @@ function Relatorio(){
                 <Link key={q.id} href={`relatorio/${q.id}`}>
                     <Card className="hover:shadow-md transition cursor-pointer">
                     <CardContent className="text-lg">
-                        <div className="flex justify-between">
-                            <p>Dificuldade: {converterDificuldade(q.dificuldade)}</p>                        
+                        <div className="flex flex-wrap justify-between gap-x-3 gap-y-1">
+                            <p>Dificuldade: {converterDificuldade(q.dificuldade)}</p>
                     <p className="text-lg">{new Date(q.data).toLocaleDateString('pt-BR')}</p>
                     </div>
-                    <h2>Quantidade de perguntas: {q.total_perguntas} - Acertos: {q.nota}</h2>
-                    <h2>Nota: {q.nota / q.total_perguntas}</h2>
+                    <h2>Quantidade de perguntas: {q.totalPerguntas} - Acertos: {q.nota}</h2>
+                    <h2>Nota: {q.nota}</h2>
                     </CardContent>
                     </Card>
                 </Link>

@@ -9,11 +9,11 @@ import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
 
    interface Quiz{
-     enunciado:string, 
+     enunciado:string,
         categoria: string,
         opcoes:string[],
-        resposta_certa:string,
-        resposta_usuario: string
+        respostaCerta:string,
+        respostaUsuario: string
     }
 
 function QuizUnico(){
@@ -28,7 +28,8 @@ function QuizUnico(){
   async  function buscarQuizUnico(){
     try{
         const data = await apiFetch(`/api/relatorio/${id}`)
-        setQuiz(data.quizzes)
+        setQuiz(data.listaPerguntas)
+        
          }catch{
          }finally{
             setCarregando(false)
@@ -43,7 +44,7 @@ function QuizUnico(){
 
 
     return (
-        <div className="min-h-screen bg-slate-200 flex flex-col items-center justify-center">
+        <div className="min-h-screen bg-slate-200 flex flex-col items-center justify-center gap-4 p-4">
             <Card className="w-full max-w-3xl">
             <CardContent className="flex flex-col gap-10 justify-start min-h-100 max-h-150 overflow-y-auto">
             {carregando ===true ?(
@@ -58,12 +59,12 @@ function QuizUnico(){
                             <p className="text-lg font-medium capitalize">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
                             <div className={`flex flex-col border rounded-lg p-4 text-lg ${
-                                p.resposta_certa === p.resposta_usuario
+                                p.respostaCerta === p.respostaUsuario
                                 ? "border-green-500 bg-green-50"
                                 : "border-red-500 bg-red-50"
                                 }`}>
-                                <p>Resposta correta: {p.resposta_certa}</p>
-                                <p>Resposta do usuário: {p.resposta_usuario}</p>
+                                <p>Resposta correta: {p.respostaCerta}</p>
+                                <p>Resposta do usuário: {p.respostaUsuario}</p>
                                 </div>
 
                                <FeedbackButton pergunta={p}/>

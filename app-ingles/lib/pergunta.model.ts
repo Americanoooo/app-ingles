@@ -4,17 +4,17 @@ import { getPool } from "./db";
 
 
 interface QuizData {
-  usuario_id: number,
+  usuarioId: number,
   dificuldade: number,
-  nota: number
+  notaCalculada: number 
 }
 
 interface Pergunta {
   enunciado: string,
   categoria: string,
   opcoes: string[],
-  resposta_certa: string,
-  resposta_usuario: string,
+  respostaCerta: string,
+  respostaUsuario: string,
   acertou: boolean,
 }
 
@@ -26,7 +26,7 @@ export async function salvarQuizCompleto(quizData: QuizData, perguntas: Pergunta
 
   const [quiz] = await conn.query<ResultSetHeader>(
     "INSERT INTO quiz (usuario_id, dificuldade, nota, data, total_perguntas) VALUES (?,?,?,CURDATE(), ?)",
-    [quizData.usuario_id, quizData.dificuldade, quizData.nota, perguntas.length],
+    [quizData.usuarioId, quizData.dificuldade, quizData.notaCalculada, perguntas.length],
   );
 
 
@@ -36,8 +36,8 @@ export async function salvarQuizCompleto(quizData: QuizData, perguntas: Pergunta
       [pergunta.enunciado,
       pergunta.categoria,
       JSON.stringify(pergunta.opcoes),
-      pergunta.resposta_certa,
-      pergunta.resposta_usuario,
+      pergunta.respostaCerta,
+      pergunta.respostaUsuario,
       pergunta.acertou,
       quiz.insertId,]
     );

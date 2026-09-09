@@ -1,5 +1,5 @@
 import { cadastrarUsuario } from '@/lib/cadastrar.model'
-import { erro500 } from '@/lib/respostas';
+import { badRequest, internalServerError } from '@/lib/respostas';
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
@@ -28,15 +28,13 @@ export async function POST(req: Request){
         const validacao = cadastrarSchema.safeParse(body)
 
         if(!validacao.success) {
-            const erroFormatado = z.flattenError(validacao.error)
-            const mensagens = Object.values(erroFormatado.fieldErrors).flat()
-            return Response.json({error: mensagens[0]}, {status:400})
+            return badRequest()
         }
 
         const { email, nome, senha } = validacao.data
-        const senha_hash = await bcrypt.hash(senha, 10)
+        const senhaHash = await bcrypt.hash(senha, 10)
 
-        await cadastrarUsuario(email,nome , senha_hash)
+        await cadastrarUsuario(email,nome , senhaHash)
         return Response.json({mensagem: 'Usuário cadastrado com sucesso'}, {status: 201})
     }catch(err:unknown){        
         if(err && typeof err === 'object' && 'code' in err && err.code === 'ER_DUP_ENTRY'){
@@ -44,6 +42,6 @@ export async function POST(req: Request){
         }
         console.log(err)
 
-        return erro500()
+        return internalServerError()
     }
 }

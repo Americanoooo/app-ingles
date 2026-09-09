@@ -10,13 +10,13 @@ export async function apiFetch (endpoint:string, options: RequestInit = {}){
         },
     });
     if(res.status ===401 && !endpoint.includes('api/login') && !endpoint.includes('api/cadastrar')){
-        window.location.href='/login';
+        window.location.href='/login'; //Forçar reset total do estado
         throw new Error('Sessão expirada')
     }
     const data = await res.json()
 
     if(!res.ok){
-        throw new ApiError(res.status, data.error || data.mensagem || data.message || 'Erro na requisição')
+        throw new ApiError(res.status, data.mensagem || 'Erro na requisição')
     }
     return data
 

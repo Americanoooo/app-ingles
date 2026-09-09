@@ -13,7 +13,7 @@ CREATE TABLE quiz(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     dificuldade INT NOT NULL,
-    nota INT NOT NULL,
+    nota DECIMAL(4, 2) NOT NULL,
     data DATE NOT NULL,
     total_perguntas INT NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)

@@ -12,12 +12,12 @@ import { FeedbackButton } from "@/app/components/FeedbackButton";
         enunciado:string,
         categoria: string,
         opcoes:string[],
-        resposta_certa:string,
+        respostaCerta:string,
     }
 
     interface Resultado{
-        resposta_certa: string,
-        resposta_usuario: string,
+        respostaCerta: string,
+        respostaUsuario: string,
         enunciado: string,
         categoria: string,
         opcoes:string[],
@@ -50,7 +50,7 @@ function Treino(){
             {method:'POST',
             body: JSON.stringify({dificuldade, quantidade})}
         )
-        setPerguntas(data.quiz)
+        setPerguntas(data)
         setTela('quiz')
 
         }catch{
@@ -65,7 +65,7 @@ function Treino(){
         try{
             const respostasQuiz = perguntas.map((p, indexPergunta)=> ({
                 ...p,
-                resposta_usuario: respostas[indexPergunta]
+                respostaUsuario: respostas[indexPergunta]
             }))
 
             const data = await apiFetch('/api/responder',
@@ -97,10 +97,10 @@ function Treino(){
 
     return(
         <>
-        <div className="min-h-screen bg-slate-200 flex items-center justify-center">
+        <div className="min-h-screen bg-slate-200 flex items-center justify-center p-4">
 
             {tela === 'setup' && (
-            <Card className="min-h-120 w-1/3 py-3 gap-5">
+            <Card className="min-h-120 w-full max-w-md py-3 gap-5">
                 <CardHeader className="px-3">
                     <CardTitle className="text-center text-xl">Treine seu inglês</CardTitle>
                 </CardHeader>
@@ -108,16 +108,16 @@ function Treino(){
                 {carregando ===false ? (
                     <>
 
-                <div className="flex justify-center gap-10">
+                <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-6 text-center">
                     <h2 className="text-xl">Escolha a  dificuldade:</h2>
-                    <div className="flex gap-5 ">
+                    <div className="flex flex-wrap justify-center gap-3 sm:gap-5">
                     <Button variant={dificuldade === 1 ? "default" : "outline"} onClick={()=> setDificuldade(1)}>Fácil</Button>
                     <Button variant={dificuldade === 2 ? "default" : "outline"} onClick={()=> setDificuldade(2)}>Média</Button>
                     <Button variant={dificuldade === 3 ? "default" : "outline"} onClick={()=> setDificuldade(3)}>Difícil</Button>
                     </div>
                 </div>
 
-                <div className="flex justify-center gap-10">
+                <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-6 text-center">
                     <h2 className="text-center text-xl">Escolha a quantidade de perguntas:</h2>
                     <Input
                     className="w-20"
@@ -127,8 +127,8 @@ function Treino(){
                     min={1}/>
 
                 </div>
-                {erro && <p className="text-red-500">{erro}</p>}
-            <Button onClick={handleQuiz} className="w-1/3">Gerar quiz</Button>
+                {erro && <p className="text-red-500 text-center">{erro}</p>}
+            <Button onClick={handleQuiz} className="w-full sm:w-auto sm:min-w-40">Gerar quiz</Button>
              </>) :(
 
                 <div>
@@ -158,9 +158,9 @@ function Treino(){
                             </Card>
                         ))}
                         <div className="flex justify-center">
-                          
-                    <Button onClick={handleEnviar} className="w-1/3">Enviar</Button>
-                      
+
+                    <Button onClick={handleEnviar} className="w-full sm:w-auto sm:min-w-40">Enviar</Button>
+
                         </div>
                         </CardContent>
                     </Card>
@@ -169,23 +169,21 @@ function Treino(){
                 {tela === 'resultado' && (
                     <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
                       <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-10 justify-start">
-                      <div className="flex items-center">
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
 
-                       <Button variant="outline" className="w-1/6" onClick={()=>  reiniciar()}>Voltar</Button>
-                        <h1 className="flex-1 text-center text-xl ">Você acertou: {acertos} de {resultado.length}</h1>
+                       <Button variant="outline" className="shrink-0" onClick={()=>  reiniciar()}>Voltar</Button>
+                        <h1 className="flex-1 min-w-40 text-center text-lg sm:text-xl">Você acertou: {acertos} de {resultado.length}</h1>
                         </div>
                         {resultado.map((p, i)=> (
                             <Card key={i} className={p.acertou ? 'border border-green-500 bg-green-50 ring-0' : 'border border-red-500 bg-red-50 ring-0'}>
-                                <CardContent className="text-lg px-1 py-3">
+                                <CardContent className="flex flex-col gap-1 text-lg px-3 py-2">
                                 <p>{p.enunciado}</p>
                                 <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
-                                <p>Sua resposta: {p.resposta_usuario}</p>
-                                {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
+                                <p>Sua resposta: {p.respostaUsuario}</p>
+                                {!p.acertou && <p>Resposta certa: {p.respostaCerta}</p>}
                                
-                                <div className="flex justify-center mx-auto ">
                                 <FeedbackButton pergunta={p}/>
-                                </div>
 
                                 </CardContent>
                                 </Card>
