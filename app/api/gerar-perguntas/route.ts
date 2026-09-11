@@ -114,6 +114,8 @@ export async function POST(req: Request) {
           
         }
 
+        
+
       return Response.json(quiz.data, {status:200})
     }catch(err:unknown){
       const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'

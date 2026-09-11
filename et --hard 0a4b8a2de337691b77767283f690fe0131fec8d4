@@ -1,0 +1,113 @@
+[33mcommit 0a4b8a2de337691b77767283f690fe0131fec8d4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Thu Sep 10 18:03:37 2026 -0300
+
+    Backup antes de colocar resposta Certa gravada no banco
+
+[33mcommit f62eb16b9981743ecb5925c5cc466a08260c7265[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Wed Sep 9 18:22:42 2026 -0300
+
+    Adicionar validação noinput na hora de gerar as perguntas, teto até 10 perguntas
+
+[33mcommit 47785356f86c9083fd37bab4f6d8702ffe071f8a[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Wed Sep 9 18:16:07 2026 -0300
+
+    Validar inputs na interação com IA com ZOD e corrigir bug do proxy
+
+[33mcommit f632edf82ef360adaec4568b83271c624e7d6e1b[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 8 21:56:20 2026 -0300
+
+    Calculo da nota gravado no banco automaticamente agora na base de 0 a 10
+
+[33mcommit 1f7fe2e427475b6258c6d1d3850408f5112bec6f[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 8 20:09:44 2026 -0300
+
+    Backup antes de mudar logica da nota
+
+[33mcommit 65f053519997fe713e290e9ee79804a1dc0de4be[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 8 19:32:22 2026 -0300
+
+    Bug que impedia o run build
+
+[33mcommit f5fd9b4a33fcd9371289efc98e3d6e5fcdeccd99[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 8 19:29:21 2026 -0300
+
+    Verificação da resposta da IA com ZOD
+
+[33mcommit 417e1f773a4a8469bef42d4cc64e5807b33cedfa[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 8 18:12:31 2026 -0300
+
+    Padronização dos endpoints e as respostas para erros
+
+[33mcommit f38b4fb74551cd2a4bdbaaef0f05a55c6ca971f0[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Sun Sep 6 13:53:09 2026 -0300
+
+    Proxy(middleware) adicionado para proteger as rotas do backend e convenção snake case apenas para interação com  banco
+
+[33mcommit 2ceb90b8d0d6735785535116a959f0dcaceedcac[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Sat Sep 5 17:27:05 2026 -0300
+
+    Responsividade mobile
+
+[33mcommit e41833c1ebb687241eaf17010e5f4dcbb675ad0b[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Sat Sep 5 16:59:00 2026 -0300
+
+    Corrigir layout do botão
+
+[33mcommit 8025df6c2724c0ef4fd067c6cae0867acf14d18e[m
+Author: Cauã Gabriel Araujo Americano <165438992+Americanoooo@users.noreply.github.com>
+Date:   Sat Sep 5 13:35:18 2026 -0300
+
+    Update page.tsx
+
+[33mcommit f396a6ec425874f75e20e284f7f4c8b7b2e0d912[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Thu Sep 3 18:54:25 2026 -0300
+
+    Transformar a feature feedback em component e aplica-lá no resultado do quiz também
+
+[33mcommit b2c421a046b8955194dd6b03eabad770552d1b42[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Wed Sep 2 19:15:10 2026 -0300
+
+    Revisar e corrigir todas as rotas apiFetch
+
+[33mcommit 81b0c75960ab70fff973d42410e97252baa8de04[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Wed Sep 2 18:55:55 2026 -0300
+
+    Corrigir bug no Authguard barrando as requisições
+
+[33mcommit 7b43e0532f4d3b67dd49b505636de507dfc4cb04[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Wed Sep 2 18:50:45 2026 -0300
+
+    Adicionar feature do feedback, a IA pega o enunciado/categoria e devolve um feeedback baseado na resposta do usuário
+
+[33mcommit 75e1120b74439164ddbe8fe85684312a3e62b7c4[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 1 18:50:13 2026 -0300
+
+    Corrigir bugs que ficaram ao migrar do JWT para o cookies httpOnly e algumas inconsistências no codigo
+
+[33mcommit 7940d4518296133a7d01d2b6cabe6a50dbd13063[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 1 18:12:44 2026 -0300
+
+    Atualizar Readme
+
+[33mcommit d701ac7ee03b1a92511275e4f2661474a5bffdef[m
+Author: Americano <caua.americano0710@gmail.com>
+Date:   Tue Sep 1 18:10:30 2026 -0300
+
+    Projeto inicial: app de treino de inglês full-stack
