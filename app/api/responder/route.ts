@@ -5,13 +5,13 @@ import { z } from "zod";
 
 
 const responderSchema = z.object({
-    dificuldade:z.number().int(),
+    dificuldade:z.number().int().min(1).max(3),
     respostaQuiz: z.array(
         z.object({
             respostaCerta: z.string(),
             respostaUsuario: z.string(),
             enunciado: z.string(),
-            categoria:z.string(),
+            categoria:z.enum(["preposicao", "tempo_verbal", "contexto"]),
             opcoes:z.array(z.string())
         })
 
@@ -35,7 +35,7 @@ export async function POST(req: Request){
     const perguntasCorrigidas = respostaQuiz.map((p)=> ({
         ...p,
         acertou: p.respostaCerta === p.respostaUsuario,
-    }));
+    })); //Alteração futura para ser validado com a resposta certa do banco de dados
 
 
 

@@ -1,22 +1,6 @@
 import { ResultSetHeader } from "mysql2";
 import { getPool } from "./db";
-
-
-
-interface QuizData {
-  usuarioId: number,
-  dificuldade: number,
-  notaCalculada: number 
-}
-
-interface Pergunta {
-  enunciado: string,
-  categoria: string,
-  opcoes: string[],
-  respostaCerta: string,
-  respostaUsuario: string,
-  acertou: boolean,
-}
+import { QuizData, Pergunta } from "@/types";
 
 export async function salvarQuizCompleto(quizData: QuizData, perguntas: Pergunta[]) {
   const conn = await getPool().getConnection();

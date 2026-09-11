@@ -7,20 +7,15 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
+import { Pergunta } from "@/types";
 
-   interface Quiz{
-     enunciado:string,
-        categoria: string,
-        opcoes:string[],
-        respostaCerta:string,
-        respostaUsuario: string
-    }
+
 
 function QuizUnico(){
     const params = useParams()
     const id = params.id
 
-    const [quiz, setQuiz]=useState<Quiz[]>([])
+    const [quiz, setQuiz]=useState<Pergunta[]>([])
     const [carregando, setCarregando]=useState(true)
 
 

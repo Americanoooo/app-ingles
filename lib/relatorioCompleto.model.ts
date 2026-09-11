@@ -13,7 +13,7 @@ export async function buscarRelatorioCompleto(quizId: number, usuarioId: number 
         id: pergunta.id,
         enunciado: pergunta.enunciado,
         categoria: pergunta.categoria,
-        opcoes: pergunta.opcoes,
+        opcoes: JSON.parse(pergunta.opcoes),
         respostaCerta: pergunta.resposta_certa,
         respostaUsuario: pergunta.resposta_usuario,
         acertou: pergunta.acertou,

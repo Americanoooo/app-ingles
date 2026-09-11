@@ -6,23 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FeedbackButton } from "@/app/components/FeedbackButton";
+import { Pergunta, Resultado } from "@/types";
 
 
-    interface Pergunta {
-        enunciado:string,
-        categoria: string,
-        opcoes:string[],
-        respostaCerta:string,
-    }
-
-    interface Resultado{
-        respostaCerta: string,
-        respostaUsuario: string,
-        enunciado: string,
-        categoria: string,
-        opcoes:string[],
-        acertou:boolean
-    }
 
 function Treino(){
     const [dificuldade, setDificuldade]=useState(0)

@@ -3,14 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiFetch } from "@/lib/apiFetch";
+import { Pergunta } from "@/types";
 import { useState } from "react";
 
-interface Pergunta{
-     enunciado:string,
-        categoria: string,
-        respostaCerta:string,
-        respostaUsuario: string
-    }
+
 
     interface FeedbackProps{
         pergunta: Pergunta

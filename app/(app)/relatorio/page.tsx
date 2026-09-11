@@ -5,15 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Quiz } from "@/types";
 
-    interface Quiz{
-        id: number,
-        usuarioId: number,
-        dificuldade: number,
-        nota: number,
-        data: string,
-        totalPerguntas: number
-    }
+
 
 
 function Relatorio(){
