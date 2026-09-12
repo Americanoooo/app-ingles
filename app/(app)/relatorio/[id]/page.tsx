@@ -17,6 +17,7 @@ function QuizUnico(){
 
     const [quiz, setQuiz]=useState<Pergunta[]>([])
     const [carregando, setCarregando]=useState(true)
+    const [erro, setErro]=useState('')
 
 
 
@@ -25,7 +26,8 @@ function QuizUnico(){
         const data = await apiFetch(`/api/relatorio/${id}`)
         setQuiz(data.listaPerguntas)
         
-         }catch{
+         }catch(error){
+            setErro(error instanceof Error ? error.message : 'Não foi possível exibir o quiz')
          }finally{
             setCarregando(false)
          }
@@ -48,6 +50,7 @@ function QuizUnico(){
 
 
                         <>
+                        {erro && <h1 className="text-center text-xl ">{erro}</h1>}
                         {quiz.map((p, indexPergunta)=> (
                             <div key={indexPergunta} className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3">
                             <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>

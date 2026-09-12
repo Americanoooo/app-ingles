@@ -13,7 +13,16 @@ export async function apiFetch (endpoint:string, options: RequestInit = {}){
         window.location.href='/login'; //Forçar reset total do estado
         throw new Error('Sessão expirada')
     }
-    const data = await res.json()
+
+
+    let data
+    try{
+     data = await res.json()
+
+    }catch(error){
+        console.error(error)
+        throw new ApiError(res.status, 'Erro interno, Tente novamente.' )
+    }
 
     if(!res.ok){
         throw new ApiError(res.status, data.mensagem || 'Erro na requisição')
