@@ -1,5 +1,6 @@
 import { cadastrarUsuario } from '@/lib/cadastrar.model'
-import { badRequest, internalServerError } from '@/lib/respostas';
+import { rateLimite } from '@/lib/rateLimite';
+import { badRequest, internalServerError, TooManyRequests } from '@/lib/respostas';
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
@@ -24,6 +25,12 @@ const cadastrarSchema = z.object({
 
 export async function POST(req: Request){
     try{
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'desconhecido'
+    const rate = await rateLimite(ip, 300, 3600)
+        if(!rate){
+            return TooManyRequests()
+        }
+
         const body = await req.json() 
         const validacao = cadastrarSchema.safeParse(body)
 

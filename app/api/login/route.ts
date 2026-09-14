@@ -1,26 +1,42 @@
 import { login } from '@/lib/login.model'
 import bcrypt from 'bcrypt'
-import { badRequest, internalServerError, unauthorized } from '@/lib/respostas'
+import { badRequest, IncorrectLogin, internalServerError, TooManyRequests } from '@/lib/respostas'
 import { createSession } from '@/lib/session'
+import { rateLimite } from '@/lib/rateLimite';
+import { success, z } from "zod";
 
+const loginSchema = z.object({
+    email: z.string(),
+    senha: z.string()
+})
 
 export const dynamic = "force-dynamic";
 
+
 export async function POST(req: Request){
     try{
-        const {email, senha} = await req.json()
-        if(!email || !senha){
+        
+        const ip =  req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'desconhecido'
+        const rate = await rateLimite(ip, 300, 3600)
+        if(!rate){
+            return TooManyRequests()
+        }
+
+        const body = await req.json()
+        const bodyValidado = await loginSchema.safeParseAsync(body)
+        if(!bodyValidado.success){
             return badRequest()
         }
 
-        const usuario = await login(email)
+        
+        const usuario = await login(bodyValidado.data.email)
         if(!usuario){
-            return unauthorized()
+            return IncorrectLogin()
         }
 
-        const certa = await bcrypt.compare(senha, usuario.senhaHash)
+        const certa = await bcrypt.compare(bodyValidado.data.senha, usuario.senhaHash)
         if(!certa){
-            return unauthorized()
+            return IncorrectLogin()
         }
         
         await createSession(String(usuario.id))

@@ -10,8 +10,16 @@ export function unauthorized(){
     return Response.json({mensagem: "Não autorizado"}, {status:401})
 }
 
+export function IncorrectLogin(){
+    return Response.json({mensagem: "Email ou senha incorretos."}, {status:401})
+}
+
 export function IAResponseError(){
     return Response.json({mensagem: "Inteligência artificial indisponível. Tente novamente"}, {status:503})
+}
+
+export function TooManyRequests(){
+    return Response.json({mensagem: "Muitas solicitações, por favor, tente novamente mais tarde"}, {status:429})
 }
 
 export function calcularNota(total_perguntas_certas: number, total_perguntas:number): number{

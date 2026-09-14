@@ -33,8 +33,8 @@ function Login() {
     try{
        await  apiFetch('/api/login', {method: 'POST', body: JSON.stringify({email, senha})})
       router.push('/treino')
-      }catch(err){
-        setErro(err instanceof ApiError ? err.message : 'Erro ao efetuar login')
+      }catch(err: unknown){
+        setErro( err instanceof  Error ? err.message : 'Erro ao efetuar login')
         setSenha('')
       }
   }
@@ -61,7 +61,7 @@ function Login() {
           </CardHeader>
           <CardContent>
           {cadastrar === false ? (
-            <form className="flex flex-col gap-7 ">
+            <form onSubmit={handleLogin} className="flex flex-col gap-7 ">
               <Input  placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
               <Input placeholder="Senha" type="password" value={senha} onChange={(e) => setSenha(e.target.value)} />
@@ -76,7 +76,7 @@ function Login() {
                 </div>
             </form>
           ) : (
-            <form className="flex flex-col gap-5">
+            <form onSubmit={handleCadastrar} className="flex flex-col gap-5">
               <Input placeholder="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
 
               <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
