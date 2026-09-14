@@ -14,12 +14,12 @@ export default async function proxy(request: NextRequest) {
       request.nextUrl.pathname === "/api/gerar-perguntas" ||
       request.nextUrl.pathname === "/api/feedback"
     ) {
-      const checar = await rateLimite(`ia:${usuarioId}`, 2, 3600);
+      const checar = await rateLimite(`ia${usuarioId}`, 75, 3600);
       if (!checar) {
         return TooManyRequests();
       }
     }else{
-      const checar = await rateLimite(`geral:${usuarioId}`, 100, 3600);
+      const checar = await rateLimite(`geral:${usuarioId}`, 120, 3600);
       if (!checar) {
         return TooManyRequests();
       }
