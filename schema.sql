@@ -25,7 +25,7 @@ CREATE TABLE pergunta(
     enunciado VARCHAR(1000) NOT NULL,
     categoria ENUM ("preposicao","tempo_verbal","contexto")NOT NULL,
     opcoes VARCHAR(1000) NOT NULL,
-    resposta_certa VARCHAR(1000) NOT NULL,
+    resposta_certa VARCHAR(1000)  NULL,
     resposta_usuario VARCHAR(1000) ,
     acertou BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (quiz_id) REFERENCES quiz(id)

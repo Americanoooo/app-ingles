@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FeedbackButton } from "@/app/components/FeedbackButton";
-import { Pergunta, Resultado } from "@/types";
+import { DadosQuiz, Pergunta, Resultado } from "@/types";
 
 
 
@@ -18,7 +18,7 @@ function Treino(){
 
     const [carregando, setCarregando]=useState(false)
 
-    const [perguntas, setPerguntas]=useState<Pergunta[]>([])
+    const [perguntas, setPerguntas]=useState<DadosQuiz | null>(null)
     const [acertos, setAcertos]= useState(0)
 
     const [respostas, setRespostas] = useState<Record<number, string>>({})
@@ -40,6 +40,7 @@ function Treino(){
         setPerguntas(data)
         setTela('quiz')
 
+
         }catch{
             setErro('Erro interno, tente novamente.')
         }finally{
@@ -50,19 +51,19 @@ function Treino(){
 
     async function handleEnviar(){
         try{
-            const respostasQuiz = perguntas.map((p, indexPergunta)=> ({
-                ...p,
+            const respostasQuiz = perguntas?.todasPerguntas.map((p, indexPergunta)=> ({
+                perguntaId: p.id,
                 respostaUsuario: respostas[indexPergunta]
             }))
 
             const data = await apiFetch('/api/responder',
                 {method: 'POST',
-                    body: JSON.stringify({dificuldade, respostaQuiz: respostasQuiz})
+                    body: JSON.stringify({quizId: perguntas?.quizId, respostasQuiz})
                 }
             )
 
-            setResultado(data.perguntasCorrigidas)
-                setAcertos(data.acertou)
+            setResultado(data.perguntasCompletas)
+                setAcertos(data.acertos)
                 setTela('resultado')
         }catch{
         }
@@ -72,7 +73,7 @@ function Treino(){
 
     function reiniciar(){
         setTela("setup");
-        setPerguntas([]);
+        setPerguntas(null);
         setRespostas({});
         setResultado([]);
         setAcertos(0);
@@ -106,6 +107,7 @@ function Treino(){
 
                 <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-6 text-center">
                     <h2 className="text-center text-xl">Escolha a quantidade de perguntas:</h2>
+                  
                     <Input
                     className="w-20"
                     value={quantidade}
@@ -129,7 +131,7 @@ function Treino(){
                 )} {tela === 'quiz'  &&(
                     <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
                         <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-7 justify-start">
-                        {perguntas.map((p, indexPergunta)=> (
+                        {perguntas?.todasPerguntas.map((p, indexPergunta)=> (
                             <Card key={indexPergunta} className="shrink-0">
                             <CardContent className="flex flex-col gap-3 py-4">
                             <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>
@@ -168,8 +170,8 @@ function Treino(){
                                 <p>{p.enunciado}</p>
                                 <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
-                                <p>Sua  resposta: {p.respostaUsuario}</p>
-                                {!p.acertou && <p>Resposta certa: {p.respostaCerta}</p>}
+                                <p>Sua  resposta: {p.resposta_usuario}</p>
+                                {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
                                
                                     <FeedbackButton pergunta={p}/>
 

@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
-import { Pergunta } from "@/types";
+import {  PerguntaBanco } from "@/types";
 
 
 
@@ -15,7 +15,7 @@ function QuizUnico(){
     const params = useParams()
     const id = params.id
 
-    const [quiz, setQuiz]=useState<Pergunta[]>([])
+    const [quiz, setQuiz]=useState<PerguntaBanco[]>([])
     const [carregando, setCarregando]=useState(true)
     const [erro, setErro]=useState('')
 

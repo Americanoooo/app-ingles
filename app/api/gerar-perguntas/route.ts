@@ -1,3 +1,5 @@
+import { pegarUsuarioId } from "@/lib/auth";
+import { SalvarQuiz } from "@/lib/pergunta.model";
 import { badRequest, IAResponseError, internalServerError } from "@/lib/respostas";
 import * as z from "zod"; 
 
@@ -111,12 +113,30 @@ export async function POST(req: Request) {
         if(!quiz.success){
               console.error("Zod falhou ao validar o formato da IA:", quiz)
               return IAResponseError()
-          
         }
 
+        let quizGravado
+
+        try{
+          const quizData = {
+            usuarioId: await pegarUsuarioId(),
+            dificuldade: input.data.dificuldade
+
+          }
+          const registrarQuiz = await SalvarQuiz(quizData, quiz.data)
+          quizGravado = {
+            quizId: registrarQuiz.quizId,
+            todasPerguntas: registrarQuiz.todasPerguntas
+
+          }
+        }catch(err: unknown){
+          console.error(err)
+          return badRequest()
+        }
+       
         
 
-      return Response.json(quiz.data, {status:200})
+      return Response.json(quizGravado, {status:200})
     }catch(err:unknown){
       const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'
       console.error(error)

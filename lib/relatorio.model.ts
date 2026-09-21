@@ -15,3 +15,4 @@ export async function relatorio(usuarioId: number){
         totalPerguntas: quiz.total_perguntas,
     }))
 }
+

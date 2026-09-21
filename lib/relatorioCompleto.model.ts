@@ -21,3 +21,4 @@ export async function buscarRelatorioCompleto(quizId: number, usuarioId: number 
     }))
 
 }
+

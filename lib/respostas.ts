@@ -22,6 +22,10 @@ export function TooManyRequests(){
     return Response.json({mensagem: "Muitas solicitações, por favor, tente novamente mais tarde"}, {status:429})
 }
 
+export function NotFounded(){
+    return Response.json({mensagem: "Não encontrado."}, {status:404})
+}
+
 export function calcularNota(total_perguntas_certas: number, total_perguntas:number): number{
  
      if(total_perguntas_certas ===0) return 0
