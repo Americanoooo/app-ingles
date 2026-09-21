@@ -5,15 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Quiz } from "@/types";
 
-    interface Quiz{
-        id: number,
-        usuarioId: number,
-        dificuldade: number,
-        nota: number,
-        data: string,
-        totalPerguntas: number
-    }
+
 
 
 function Relatorio(){
@@ -21,6 +15,7 @@ function Relatorio(){
     const [carregando, setCarregando]= useState(true)
     const [filtroDificuldade, setFiltroDificuldade]=useState('Todas')
     const [filtroPeriodo, setFiltroPeriodo] = useState("Todas");
+    const [erro, setErro]=useState('')
 
 
 
@@ -57,7 +52,8 @@ function Relatorio(){
         try{
             const data = await apiFetch('/api/relatorio',)
             setQuiz(data.quizzes)
-        }catch{
+        }catch(error){
+            setErro(error instanceof Error ? error.message : 'Não foi possível exibir o relatório.')
         }finally{
             setCarregando(false)
         }
@@ -115,7 +111,7 @@ function Relatorio(){
 
         
         <div className="overflow-y-auto max-h-[70vh] ">
-
+            {erro && <p>{erro}</p>}
             {quizzesFiltrados.length > 0 ?(
                 < >
                 <div className=" grid grid-cols-1 md:grid-cols-2 gap-5   ">
@@ -140,9 +136,9 @@ function Relatorio(){
             </>
             ): (
                 <>
-                <h2>
+               {!erro && (<h2>
                     Nenhum quiz cadastrado
-                    </h2>
+                    </h2>)} 
                     </>
 
             )}

@@ -5,12 +5,21 @@ const RespostaIA = z.object({
     explicacao: z.string()
 })
 
+const Input = z.object({
+    enunciado: z.string(),
+    respostaUsuario: z.string(),
+    respostaCerta: z.string(),
+    categoria: z.enum(["preposicao", "tempo_verbal", "contexto"]),
+})
+
 export async function POST(req: Request){
     try{
-    const {enunciado, respostaUsuario, respostaCerta, categoria}= await req.json();
-        if(!enunciado || !respostaUsuario|| !respostaCerta || !categoria){
-            return badRequest()
-        }
+    const body = await req.json();
+    const validacao = await Input.safeParseAsync(body)
+    if(!validacao.success){
+        return badRequest()
+    }
+
         const API_KEY = process.env.GEMINI_API_KEY;
 
         const resposta = await fetch(
@@ -30,10 +39,10 @@ export async function POST(req: Request){
                     },
                     {
                         role: 'user',
-                        content: `Um aluno respondeu uma questão de inglês sobre ${categoria}.
-                                    Pergunta: "${enunciado}"
-                                    Resposta correta: "${respostaCerta}"
-                                    Resposta do aluno: "${respostaUsuario}"
+                        content: `Um aluno respondeu uma questão de inglês sobre ${validacao.data.categoria}.
+                                    Pergunta: "${validacao.data.enunciado}"
+                                    Resposta correta: "${validacao.data.respostaCerta}"
+                                    Resposta do aluno: "${validacao.data.respostaUsuario}"
 
                                     Se o aluno acertou, confirme e explique por que está correto. Se errou, explique por que a resposta correta é a certa e por que a dele não serve. Responda em português, de forma simples e didática.`
                     },

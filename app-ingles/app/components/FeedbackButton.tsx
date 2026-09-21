@@ -3,17 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiFetch } from "@/lib/apiFetch";
+import {  PerguntaFeedback } from "@/types";
 import { useState } from "react";
 
-interface Pergunta{
-     enunciado:string,
-        categoria: string,
-        respostaCerta:string,
-        respostaUsuario: string
-    }
+
 
     interface FeedbackProps{
-        pergunta: Pergunta
+        pergunta: PerguntaFeedback
     }
 
 
@@ -35,8 +31,8 @@ export function FeedbackButton({pergunta}: FeedbackProps){
                 method:"POST",
                 body: JSON.stringify({
                     enunciado: pergunta.enunciado,
-                    respostaCerta: pergunta.respostaCerta,
-                    respostaUsuario:pergunta.respostaUsuario,
+                    respostaCerta: pergunta.resposta_certa,
+                    respostaUsuario:pergunta.resposta_usuario,
                     categoria: pergunta.categoria
                 }),
             });

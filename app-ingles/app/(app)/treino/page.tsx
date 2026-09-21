@@ -6,23 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { FeedbackButton } from "@/app/components/FeedbackButton";
+import { DadosQuiz, Pergunta, Resultado } from "@/types";
 
 
-    interface Pergunta {
-        enunciado:string,
-        categoria: string,
-        opcoes:string[],
-        respostaCerta:string,
-    }
-
-    interface Resultado{
-        respostaCerta: string,
-        respostaUsuario: string,
-        enunciado: string,
-        categoria: string,
-        opcoes:string[],
-        acertou:boolean
-    }
 
 function Treino(){
     const [dificuldade, setDificuldade]=useState(0)
@@ -32,7 +18,7 @@ function Treino(){
 
     const [carregando, setCarregando]=useState(false)
 
-    const [perguntas, setPerguntas]=useState<Pergunta[]>([])
+    const [perguntas, setPerguntas]=useState<DadosQuiz | null>(null)
     const [acertos, setAcertos]= useState(0)
 
     const [respostas, setRespostas] = useState<Record<number, string>>({})
@@ -41,10 +27,13 @@ function Treino(){
 
     const [erro, setErro]=useState('')
 
+    const [erroPerguntas, setErroPerguntas]= useState('')
+
 
    async function handleQuiz(){
         if(!dificuldade || !quantidade || Number(quantidade) < 1) return setErro('Preencha todos os campos')
-    setCarregando(true)
+        if(Number(quantidade) > 10 || Number(quantidade) < 1) return setErro('Escolha entre 1 e 10 perguntas.')
+            setCarregando(true)
         try{
         const data = await apiFetch('/api/gerar-perguntas',
             {method:'POST',
@@ -52,6 +41,7 @@ function Treino(){
         )
         setPerguntas(data)
         setTela('quiz')
+
 
         }catch{
             setErro('Erro interno, tente novamente.')
@@ -63,21 +53,22 @@ function Treino(){
 
     async function handleEnviar(){
         try{
-            const respostasQuiz = perguntas.map((p, indexPergunta)=> ({
-                ...p,
+            const respostasQuiz = perguntas?.todasPerguntas.map((p, indexPergunta)=> ({
+                perguntaId: p.id,
                 respostaUsuario: respostas[indexPergunta]
             }))
 
             const data = await apiFetch('/api/responder',
                 {method: 'POST',
-                    body: JSON.stringify({dificuldade, respostaQuiz: respostasQuiz})
+                    body: JSON.stringify({quizId: perguntas?.quizId, respostasQuiz})
                 }
             )
 
-            setResultado(data.perguntasCorrigidas)
-                setAcertos(data.acertou)
+            setResultado(data.perguntasCompletas)
+                setAcertos(data.acertos)
                 setTela('resultado')
         }catch{
+            setErroPerguntas('Preencha todas as perguntas.')
         }
     }
 
@@ -85,13 +76,14 @@ function Treino(){
 
     function reiniciar(){
         setTela("setup");
-        setPerguntas([]);
+        setPerguntas(null);
         setRespostas({});
         setResultado([]);
         setAcertos(0);
         setQuantidade('')
         setDificuldade(0)
         setErro('')
+        setErroPerguntas('')
 
     }
 
@@ -119,12 +111,14 @@ function Treino(){
 
                 <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-6 text-center">
                     <h2 className="text-center text-xl">Escolha a quantidade de perguntas:</h2>
+                  
                     <Input
                     className="w-20"
                     value={quantidade}
                     onChange={(e)=> setQuantidade(e.target.value)}
                     type="number"
-                    min={1}/>
+                    min={1}
+                    max={10}/>
 
                 </div>
                 {erro && <p className="text-red-500 text-center">{erro}</p>}
@@ -141,7 +135,7 @@ function Treino(){
                 )} {tela === 'quiz'  &&(
                     <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
                         <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-7 justify-start">
-                        {perguntas.map((p, indexPergunta)=> (
+                        {perguntas?.todasPerguntas.map((p, indexPergunta)=> (
                             <Card key={indexPergunta} className="shrink-0">
                             <CardContent className="flex flex-col gap-3 py-4">
                             <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>
@@ -157,8 +151,9 @@ function Treino(){
                             </CardContent>
                             </Card>
                         ))}
-                        <div className="flex justify-center">
+                                                {erroPerguntas && <p className="text-red-500 text-center">{erroPerguntas}</p>}
 
+                        <div className="flex justify-center">
                     <Button onClick={handleEnviar} className="w-full sm:w-auto sm:min-w-40">Enviar</Button>
 
                         </div>
@@ -175,17 +170,18 @@ function Treino(){
                         <h1 className="flex-1 min-w-40 text-center text-lg sm:text-xl">Você acertou: {acertos} de {resultado.length}</h1>
                         </div>
                         {resultado.map((p, i)=> (
-                            <Card key={i} className={p.acertou ? 'border border-green-500 bg-green-50 ring-0' : 'border border-red-500 bg-red-50 ring-0'}>
-                                <CardContent className="flex flex-col gap-1 text-lg px-3 py-2">
+                            <Card key={i} className={p.acertou ? 'shrink-0 border border-green-500 bg-green-50 ring-0' : 'shrink-0 border border-red-500 bg-red-50 ring-0'}>
+                                <CardContent className="flex flex-col gap-1 text-lg px-3 py-2 ">
                                 <p>{p.enunciado}</p>
                                 <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
-                                <p>Sua resposta: {p.respostaUsuario}</p>
-                                {!p.acertou && <p>Resposta certa: {p.respostaCerta}</p>}
+                                <p>Sua  resposta: {p.resposta_usuario}</p>
+                                {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
                                
-                                <FeedbackButton pergunta={p}/>
+                                    <FeedbackButton pergunta={p}/>
 
                                 </CardContent>
+
                                 </Card>
                         ))}
                         </CardContent>
