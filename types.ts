@@ -34,7 +34,7 @@ export interface PerguntasFront{
 export interface Pergunta {
   perguntaId?: number,
   enunciado: string,
-  categoria?: "preposicao" | "tempo_verbal" | "contexto",
+  categoria: "preposicao" | "tempo_verbal" | "contexto",
   opcoes: string[],
   respostaCerta?: string,
   respostaUsuario?: string,
@@ -44,7 +44,7 @@ export interface Pergunta {
 
 export interface PerguntaFeedback {
   enunciado: string,
-  categoria?: "preposicao" | "tempo_verbal" | "contexto",
+  categoria: "preposicao" | "tempo_verbal" | "contexto",
   resposta_certa: string,
   resposta_usuario: string,
 }

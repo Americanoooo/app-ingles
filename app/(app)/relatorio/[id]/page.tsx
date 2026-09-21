@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
-import {  PerguntaBanco } from "@/types";
+import {  PerguntaFeedback } from "@/types";
 
 
 
@@ -15,7 +15,7 @@ function QuizUnico(){
     const params = useParams()
     const id = params.id
 
-    const [quiz, setQuiz]=useState<PerguntaBanco[]>([])
+    const [quiz, setQuiz]=useState<PerguntaFeedback[]>([])
     const [carregando, setCarregando]=useState(true)
     const [erro, setErro]=useState('')
 
@@ -57,12 +57,12 @@ function QuizUnico(){
                             <p className="text-lg font-medium capitalize">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
                             <div className={`flex flex-col border rounded-lg p-4 text-lg ${
-                                p.respostaCerta === p.respostaUsuario
+                                p.resposta_certa === p.resposta_usuario
                                 ? "border-green-500 bg-green-50"
                                 : "border-red-500 bg-red-50"
                                 }`}>
-                                <p>Resposta correta: {p.respostaCerta}</p>
-                                <p>Resposta do usuário: {p.respostaUsuario}</p>
+                                <p>Resposta correta: {p.resposta_certa}</p>
+                                <p>Resposta do usuário: {p.resposta_usuario}</p>
                                 </div>
 
                                <FeedbackButton pergunta={p}/>

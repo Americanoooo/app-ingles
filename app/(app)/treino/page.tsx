@@ -2,9 +2,10 @@
 
 import { apiFetch } from "@/lib/apiFetch";
 import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { FeedbackButton } from "@/app/components/FeedbackButton";
 import { DadosQuiz, Pergunta, Resultado } from "@/types";
 
@@ -26,6 +27,8 @@ function Treino(){
     const [resultado, setResultado] = useState<Resultado[]>([]);
 
     const [erro, setErro]=useState('')
+
+    const [erroPerguntas, setErroPerguntas]= useState('')
 
 
    async function handleQuiz(){
@@ -66,6 +69,7 @@ function Treino(){
                 setAcertos(data.acertos)
                 setTela('resultado')
         }catch{
+            setErroPerguntas('Preencha todas as perguntas.')
         }
     }
 
@@ -80,113 +84,130 @@ function Treino(){
         setQuantidade('')
         setDificuldade(0)
         setErro('')
+        setErroPerguntas('')
 
     }
 
     return(
         <>
-        <div className="min-h-screen bg-slate-200 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
 
             {tela === 'setup' && (
-            <Card className="min-h-120 w-full max-w-md py-3 gap-5">
-                <CardHeader className="px-3">
-                    <CardTitle className="text-center text-xl">Treine seu inglês</CardTitle>
+            <Card className="w-full max-w-md gap-0 rounded-3xl p-0">
+                <CardHeader className="items-center gap-1 px-6 pt-6 pb-2 text-center">
+                    <CardTitle className="font-heading text-3xl font-bold tracking-tight text-foreground">Treine seu inglês</CardTitle>
+                    <p className="text-md text-muted-foreground">Escolha o nível e a quantidade de perguntas</p>
                 </CardHeader>
-                <CardContent className="px-3 flex flex-col gap-5 items-center">
+                <CardContent className="px-6 pt-4 pb-6 flex flex-col gap-6 items-center">
                 {carregando ===false ? (
                     <>
 
-                <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-6 text-center">
-                    <h2 className="text-xl">Escolha a  dificuldade:</h2>
-                    <div className="flex flex-wrap justify-center gap-3 sm:gap-5">
-                    <Button variant={dificuldade === 1 ? "default" : "outline"} onClick={()=> setDificuldade(1)}>Fácil</Button>
-                    <Button variant={dificuldade === 2 ? "default" : "outline"} onClick={()=> setDificuldade(2)}>Média</Button>
-                    <Button variant={dificuldade === 3 ? "default" : "outline"} onClick={()=> setDificuldade(3)}>Difícil</Button>
+                <div className="flex flex-col items-center gap-3 w-full">
+                    <h2 className="text-sm font-semibold text-foreground">Dificuldade</h2>
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                    <Button variant={dificuldade === 1 ? "default" : "outline"} size="lg" className="rounded-full px-2" onClick={()=> setDificuldade(1)}>Fácil</Button>
+                    <Button variant={dificuldade === 2 ? "default" : "outline"} size="lg" className="rounded-full px-2" onClick={()=> setDificuldade(2)}>Média</Button>
+                    <Button variant={dificuldade === 3 ? "default" : "outline"} size="lg" className="rounded-full px-2" onClick={()=> setDificuldade(3)}>Difícil</Button>
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-3 sm:gap-6 text-center">
-                    <h2 className="text-center text-xl">Escolha a quantidade de perguntas:</h2>
-                  
+                <div className="flex flex-col items-center gap-3">
+                    <h2 className="text-sm font-semibold text-foreground">Quantidade de perguntas</h2>
+
                     <Input
-                    className="w-20"
+                    className="h-12 w-24 rounded-2xl text-center text-lg font-bold"
                     value={quantidade}
                     onChange={(e)=> setQuantidade(e.target.value)}
                     type="number"
                     min={1}
                     max={10}/>
-
+                    <p className="text-xs text-muted-foreground">Entre 1 e 10 perguntas</p>
                 </div>
-                {erro && <p className="text-red-500 text-center">{erro}</p>}
-            <Button onClick={handleQuiz} className="w-full sm:w-auto sm:min-w-40">Gerar quiz</Button>
+                {erro && <p className="text-destructive text-sm font-medium text-center">{erro}</p>}
+            <Button onClick={handleQuiz} size="lg" className="w-full rounded-full">Gerar quiz</Button>
              </>) :(
 
-                <div>
-                    <h1 className="text-xl ">Carregando...</h1>
+                <div className="flex flex-col items-center gap-3 py-10">
+                    <Loader2 className="size-10 animate-spin text-primary" />
+                    <p className="font-heading text-lg font-semibold text-foreground">Preparando seu quiz...</p>
                 </div>
 
             )}
             </CardContent>
             </Card>
                 )} {tela === 'quiz'  &&(
-                    <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
-                        <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-7 justify-start">
+                    <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col gap-0 p-0 overflow-hidden">
+                        <CardHeader className="px-4 py-3 border-b border-border">
+                            <CardTitle className="font-heading text-lg font-bold text-foreground">Responda as perguntas</CardTitle>
+                        </CardHeader>
+                        <div className="px-4 py-4 flex-1 overflow-y-auto flex flex-col gap-4 justify-start">
                         {perguntas?.todasPerguntas.map((p, indexPergunta)=> (
-                            <Card key={indexPergunta} className="shrink-0">
+                            <Card key={indexPergunta} className="shrink-0 rounded-2xl gap-3">
                             <CardContent className="flex flex-col gap-3 py-4">
-                            <p className="text-xl font-medium">{indexPergunta + 1}.{p.enunciado}</p>
-                            <div className="flex flex-col gap-3 py-1">
+                            <div className="flex items-start gap-3">
+                            <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-heading text-sm font-bold text-primary-foreground">{indexPergunta + 1}</span>
+                            <p className="pt-1 text-base font-semibold text-foreground">{p.enunciado}</p>
+                            </div>
+                            <div className="flex flex-col gap-2">
                             {p.opcoes.map((o, indexOpcao)=> (
                                 <Button key={indexOpcao}
                                 variant={respostas[indexPergunta] === o ? "default" : "outline"}
+                                size="lg"
                                 onClick={()=> setRespostas({... respostas, [indexPergunta]: o})}
-                                className="w-full justify-start text-left h-auto py-1">{o}</Button>
+                                className="w-full justify-start text-left h-auto py-3 rounded-2xl whitespace-normal">{o}</Button>
 
                             ))}
                             </div>
                             </CardContent>
                             </Card>
                         ))}
-                        <div className="flex justify-center">
-
-                    <Button onClick={handleEnviar} className="w-full sm:w-auto sm:min-w-40">Enviar</Button>
-
+                                                {erroPerguntas && <p className="text-destructive text-sm font-medium text-center">{erroPerguntas}</p>}
                         </div>
-                        </CardContent>
+
+                        <CardFooter className="shrink-0">
+                    <Button onClick={handleEnviar} size="lg" className="w-full rounded-full">Enviar respostas</Button>
+
+                        </CardFooter>
                     </Card>
                 )}
 
                 {tela === 'resultado' && (
-                    <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col">
-                      <CardContent className="px-3 flex-1 overflow-y-auto flex flex-col gap-10 justify-start">
-                      <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                    <Card className="w-full max-w-2xl max-h-[85vh] flex flex-col gap-0 p-0 overflow-hidden">
+                      <CardHeader className="gap-4 px-4 py-5 border-b border-border">
+                      <div className="flex items-center justify-between gap-3">
 
-                       <Button variant="outline" className="shrink-0" onClick={()=>  reiniciar()}>Voltar</Button>
-                        <h1 className="flex-1 min-w-40 text-center text-lg sm:text-xl">Você acertou: {acertos} de {resultado.length}</h1>
+                       <Button variant="outline" size="sm" className="shrink-0 rounded-full" onClick={()=>  reiniciar()}>Voltar</Button>
+                        <span className="text-sm font-medium text-muted-foreground">Resultado</span>
                         </div>
+                        <div className="flex flex-col items-center gap-1 text-center">
+                        <p className="font-heading text-5xl font-bold text-primary">{acertos}<span className="text-2xl text-muted-foreground">/{resultado.length}</span></p>
+                        <p className="text-sm font-semibold text-foreground">{resultado.length > 0 && acertos === resultado.length ? "Mandou muito bem! 🎉" : resultado.length > 0 && acertos >= resultado.length / 2 ? "Bom trabalho!" : "Continue treinando!"}</p>
+                        </div>
+                      </CardHeader>
+                      <div className="px-4 py-4 flex-1 overflow-y-auto flex flex-col gap-3 justify-start">
                         {resultado.map((p, i)=> (
-                            <Card key={i} className={p.acertou ? 'shrink-0 border border-green-500 bg-green-50 ring-0' : 'shrink-0 border border-red-500 bg-red-50 ring-0'}>
-                                <CardContent className="flex flex-col gap-1 text-lg px-3 py-2 ">
-                                <p>{p.enunciado}</p>
-                                <p className="capitalize ">Categoria: {p.categoria.replace(/_/g, " ")}</p>
+                            <Card key={i} className={p.acertou ? 'shrink-0 gap-1 rounded-2xl border-2 border-success bg-success/10' : 'shrink-0 gap-1 rounded-2xl border-2 border-destructive bg-destructive/10'}>
+                                <CardContent className="flex flex-col gap-1 text-base px-3 py-3">
+                                <p className="font-semibold text-foreground">{p.enunciado}</p>
+                                <p className="capitalize text-xs font-medium text-muted-foreground">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
-                                <p>Sua  resposta: {p.resposta_usuario}</p>
-                                {!p.acertou && <p>Resposta certa: {p.resposta_certa}</p>}
-                               
+                                <p className="text-foreground">Sua  resposta: {p.resposta_usuario}</p>
+                                {!p.acertou && <p className="font-semibold text-success">Resposta certa: {p.resposta_certa}</p>}
+
                                     <FeedbackButton pergunta={p}/>
 
                                 </CardContent>
 
                                 </Card>
                         ))}
-                        </CardContent>
+                        </div>
                     </Card>
-                    
+
                 )}
-                
+
 
         </div>
-       
+
         </>
 
     )
