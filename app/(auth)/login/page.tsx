@@ -40,15 +40,20 @@ function Login() {
   }
 
   async function handleCadastrar(e: React.FormEvent){
+        if(!nome || !email || !senha){
+      return setErro('Preencha todos os campos')
+    }
     e.preventDefault()
     try{
+  
          await apiFetch('/api/cadastrar',
         {method: 'POST', body: JSON.stringify({nome, email,senha})}
       )
       setSucesso('Cadastro efetuado com sucesso')
       setErro('')
     }catch(err:unknown){
-      setErro( err instanceof  Error ? err.message : 'Erro ao cadastrar')
+      setErro( err instanceof  Error ? err.message : 'Não foi possível realizar o cadastro')
+      console.log(err)
     }
   }
 

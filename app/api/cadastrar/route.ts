@@ -35,7 +35,7 @@ export async function POST(req: Request){
         const validacao = cadastrarSchema.safeParse(body)
 
         if(!validacao.success) {
-            return badRequest()
+            return Response.json({mensagem: validacao.error.issues[0].message}, {status:400})
         }
 
         const { email, nome, senha } = validacao.data

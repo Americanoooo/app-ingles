@@ -1,6 +1,6 @@
 # App Inglês 🇬🇧
 
-Treinador de inglês full-stack com quiz e feedback gerados por IA — a nota é sempre calculada no servidor, nunca confiada ao cliente.
+Treinador de inglês full-stack com quiz e feedback gerados por IA — a nota é sempre calculada no servidor, a partir do gabarito que está no banco, nunca de dado enviado pelo cliente.
 
 🔗 Demo: https://app-ingles-bay.vercel.app/treino
 📦 Repo: https://github.com/Americanoooo/app-ingles
@@ -19,15 +19,17 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 
 - **Autenticação completa** — cadastro e login com senha criptografada e sessão via cookie httpOnly (proteção contra roubo de token via XSS).
 - **Autorização por dono (anti-IDOR)** — cada usuário só vê os próprios quizzes; id de outro dono na URL não vaza dado (404 genérico, também anti-enumeração).
+- **Rate limiting** — limites por IP nas rotas públicas (login/cadastro) e por usuário nas autenticadas, com contadores independentes para as rotas que chamam a IA (mais caras) e para o restante.
 - **Geração de quiz por IA** — escolha de dificuldade e quantidade de perguntas; a IA gera questões de múltipla escolha nas categorias *preposição*, *tempo verbal* e *contexto*.
 
   ![Quiz gerado pela IA](docs/quiz.PNG)
 
-- **Correção automática** — a nota é calculada no servidor, com persistência atômica no banco.
-- **Tela de resultado** — acertos destacados visualmente (verde/vermelho) com a resposta correta.
+- **Correção no servidor** — o quiz é persistido no momento da geração e corrigido contra o gabarito do banco, dentro de uma transação.
+- **Tela de resultado** — acertos destacados visualmente (verde/vermelho), com a resposta correta revelada apenas nas perguntas erradas.
 
   ![Tela de resultado](docs/resultado.PNG)
 
+- **Feedback por pergunta** — explicação gerada por IA, em português, do porquê da resposta correta.
 - **Histórico de quizzes** — relatório com filtros por dificuldade e período; revisão pergunta a pergunta de um quiz antigo.
 
   ![Revisão de quiz](docs/relatorio.PNG)
@@ -39,17 +41,23 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 **Front-end:** Next.js (App Router) · React · TypeScript · Tailwind CSS + shadcn/ui
 **Back-end:** Next.js Route Handlers · MySQL (`mysql2`) · Zod · bcrypt · jose (JWT em cookie httpOnly)
 **IA:** Google Gemini (endpoint compatível com OpenAI), saída estruturada via `json_schema`
-**Infraestrutura:** Docker + Docker Compose · Deploy: Vercel (app) + Aiven (MySQL)
+**Infraestrutura:** Docker + Docker Compose · Upstash Redis (rate limiting) · Deploy: Vercel (app) + Aiven (MySQL)
 
 ---
 
 ## 🧠 Destaques de arquitetura
 
+**Falha de segurança que eu encontrei e corrigi: nota forjável pelo cliente.** Na primeira versão, o quiz só era gravado quando o usuário respondia — o que significa que, na hora de corrigir, o `/api/responder` recebia a resposta certa de cada pergunta no mesmo body que o cliente reenviava. O servidor até calculava a nota (o cliente não mandava `acertou: true`), mas comparava **dois valores que o próprio cliente controlava**: bastava abrir o DevTools, ler o gabarito e reenviar `respostaUsuario = respostaCerta` pra forçar 10/10.
+
+A correção mudou o fluxo: `/api/gerar-perguntas` passou a persistir quiz e perguntas (com o gabarito) no momento da geração, dentro de uma transação, e devolve pro front apenas `quizId`, os ids das perguntas, enunciados e opções — a resposta certa nunca sai do servidor. O `/api/responder` recebe só `quizId` e os pares `{perguntaId, respostaUsuario}`, busca o gabarito real no banco com checagem de dono (JOIN por `usuario_id`), calcula acerto e nota, e faz o UPDATE. Nada que o cliente envie participa da decisão do que é certo — e, de quebra, o gabarito deixou de ficar visível no DevTools durante o quiz.
+
+**Trade-off que eu aceitei conscientemente.** Persistir o quiz antes de existir resposta significa aceitar linhas incompletas no banco: `nota`, `resposta_usuario` e `acertou` nascem nulos e só são preenchidos quando o usuário envia. Além de exigir que essas colunas fossem nullable, isso cria um efeito colateral: quizzes gerados e nunca respondidos ficam guardados. A alternativa (segurar tudo em memória até o envio) manteria o banco limpo, mas não sobrevive a um ambiente serverless, onde a próxima requisição pode cair em outra instância. Escolhi o dado incompleto em vez da falha de segurança, e lidei com as consequências: o relatório filtra por `nota IS NOT NULL`, e a limpeza dos quizzes abandonados está no roadmap.
+
 **Saída estruturada da IA (`json_schema`).** Resposta de LLM em texto livre é inconsistente na prática — e isso não é só estética: um parse que falha vira bug real na experiência do usuário (quiz não carrega, feedback trava). Por isso a geração das perguntas e o feedback por pergunta usam saída estruturada (`json_schema`, na chamada compatível com OpenAI ao Gemini) — o schema trava os campos que a IA precisa devolver, então o código lê cada um com confiança em vez de tentar adivinhar texto solto. Como camada extra, a resposta ainda passa por validação com Zod antes de qualquer gravação no banco — defesa em profundidade: o schema garante o formato na saída do LLM, o Zod garante que o que chega no back-end bate com o que o banco espera, mesmo que o provedor mude de comportamento.
 
-**Persistência atômica + injeção de dependência no model.** Quiz e perguntas precisam ser gravados como uma unidade: se a inserção de uma pergunta falhar no meio do caminho, sobra um quiz órfão (dado incompleto) no banco. Por isso `salvarQuizCompleto` abre uma transaction (`beginTransaction` → inserts → `commit`, com `rollback` no catch) garantindo tudo-ou-nada. O detalhe que faz isso funcionar: as funções do model recebem `db: Pool | PoolConnection` como parâmetro em vez de usar o `pool` global direto — porque todos os inserts da transação precisam rodar na **mesma conexão** (se cada um pegasse uma conexão qualquer do pool, o rollback de uma não teria efeito nenhum sobre o que já rodou em outra). A mesma função de insert roda tanto dentro da transação (recebendo a `PoolConnection` aberta) quanto avulsa (recebendo o `pool`), sem duplicar código.
+**Persistência atômica.** Quiz e perguntas precisam ser gravados como uma unidade: se a inserção de uma pergunta falhar no meio do caminho, sobra um quiz órfão no banco. Por isso `SalvarQuiz` e `atualizarRespostas` abrem uma transação (`beginTransaction` → queries → `commit`, com `rollback` no catch e `release` da conexão no `finally`). Todas as queries da transação rodam na **mesma conexão** obtida do pool — se cada uma pegasse uma conexão qualquer, o rollback de uma não teria efeito nenhum sobre o que já rodou em outra.
 
-**Trade-off consciente (v1): o gabarito ainda trafega pelo cliente.** O quiz gerado só é salvo no banco quando o usuário responde (é aí que existem nota e respostas pra gravar) — então `/api/responder` recebe a resposta certa de cada pergunta no mesmo body que o cliente reenvia. O servidor ainda é quem calcula a nota (o cliente não manda `acertou: true` diretamente), mas hoje não existe uma fonte de verdade independente do gabarito: em teoria, alguém no DevTools poderia editar o body antes de enviar e forçar 10/10. Fechar essa lacuna de vez é persistir o quiz no momento da geração e o `/api/responder` buscar o gabarito por `quizId` em vez de aceitá-lo no body (ver Roadmap).
+**Uma convenção de nomes, convertida num lugar só.** O banco usa snake_case e o restante da aplicação usa camelCase. A conversão acontece dentro dos models (`lib/*.model.ts`), logo depois da query: rotas e front nunca veem nome de coluna. Antes disso, uma rota devolvia a linha crua do banco enquanto outras já convertiam, e o mesmo dado chegava com dois formatos diferentes dependendo da tela — origem de vários bugs silenciosos, porque o TypeScript não acusa quando a interface descreve um formato que o dado real não tem.
 
 ---
 
@@ -88,6 +96,8 @@ DB_NAME=app_ingles
 DB_PORT=3306
 JWT_SECRET=uma_chave_secreta_longa
 GEMINI_API_KEY=sua_chave_do_gemini
+UPSTASH_REDIS_REST_URL=url_do_seu_redis
+UPSTASH_REDIS_REST_TOKEN=token_do_seu_redis
 ```
 
 > O `.env` está no `.gitignore` e não é versionado. A chave do Gemini é gratuita no Google AI Studio.
@@ -113,8 +123,8 @@ dockerfile
 
 ## 🗺️ Roadmap
 
+- **Limpeza de quizzes abandonados** — rotina agendada para remover quizzes gerados e nunca respondidos, consequência assumida do fluxo de persistir antes de responder.
 - **Modo adaptativo** — gerar perguntas focadas nas categorias que o usuário mais erra, lendo o histórico de acertos.
-- **Fechar a lacuna do gabarito** — persistir o quiz no momento da geração e validar a resposta contra o banco (`quizId`), não contra o que o cliente reenvia.
 
 ---
 
@@ -126,6 +136,6 @@ dockerfile
 
 ## English summary
 
-Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js App Router, TypeScript, MySQL). The server is the source of truth for scoring — the client never decides the result. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Quiz and questions are persisted atomically inside a single DB transaction, with dependency injection (`Pool | PoolConnection`) so the same model functions run standalone or inside the transaction. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history.
+Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js App Router, TypeScript, MySQL). The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Writes run inside a single DB transaction on one pooled connection. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
 
 Demo: https://app-ingles-bay.vercel.app/treino · Repo: github.com/Americanoooo/app-ingles
