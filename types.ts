@@ -42,14 +42,6 @@ export interface Pergunta {
 }
 
 
-export interface PerguntaFeedback {
-  enunciado: string,
-  categoria: "preposicao" | "tempo_verbal" | "contexto",
-  resposta_certa: string,
-  resposta_usuario: string,
-}
-
-
 export interface PerguntaBanco extends RowDataPacket{
   id: number,
   enunciado: string,
@@ -60,17 +52,18 @@ export interface PerguntaBanco extends RowDataPacket{
   acertou: boolean,
 }
 
-export interface AtualizarPergunta {
-  id:number,
-  perguntas: PerguntaBanco[]
+export interface PerguntaQuiz {
+  id: number,
+  enunciado: string,
+  categoria: "preposicao" | "tempo_verbal" | "contexto",
+  opcoes: string[],
+  respostaCerta: string,
+  respostaUsuario: string,
+  acertou: boolean,
+  quizId: number,
 }
 
-
-  export interface Resultado{
-        resposta_certa: string,
-        resposta_usuario: string,
-        enunciado: string,
-        categoria: "preposicao" | "tempo_verbal" | "contexto",
-        opcoes:string[],
-        acertou:boolean
-    }
+export interface AtualizarPergunta {
+  id:number,
+  perguntas: PerguntaQuiz[]
+}

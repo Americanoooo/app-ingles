@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { FeedbackButton } from "@/app/components/FeedbackButton";
-import { DadosQuiz, Pergunta, Resultado } from "@/types";
+import { DadosQuiz, Pergunta } from "@/types";
 
 
 
@@ -24,7 +24,7 @@ function Treino(){
 
     const [respostas, setRespostas] = useState<Record<number, string>>({})
 
-    const [resultado, setResultado] = useState<Resultado[]>([]);
+    const [resultado, setResultado] = useState<Pergunta[]>([]);
 
     const [erro, setErro]=useState('')
 
@@ -177,7 +177,7 @@ function Treino(){
                       <div className="flex items-center justify-between gap-3">
 
                        <Button variant="outline" size="sm" className="shrink-0 rounded-full" onClick={()=>  reiniciar()}>Voltar</Button>
-                        <span className="text-sm font-medium text-muted-foreground">Resultado</span>
+                        <span className="text-sm font-medium text-muted-foreground ">Resultado</span>
                         </div>
                         <div className="flex flex-col items-center gap-1 text-center">
                         <p className="font-heading text-5xl font-bold text-primary">{acertos}<span className="text-2xl text-muted-foreground">/{resultado.length}</span></p>
@@ -191,8 +191,8 @@ function Treino(){
                                 <p className="font-semibold text-foreground">{p.enunciado}</p>
                                 <p className="capitalize text-xs font-medium text-muted-foreground">Categoria: {p.categoria.replace(/_/g, " ")}</p>
 
-                                <p className="text-foreground">Sua  resposta: {p.resposta_usuario}</p>
-                                {!p.acertou && <p className="font-semibold text-success">Resposta certa: {p.resposta_certa}</p>}
+                                <p className="text-foreground">Sua  resposta: {p.respostaUsuario}</p>
+                                {!p.acertou && <p className="font-semibold text-success">Resposta certa: {p.respostaCerta}</p>}
 
                                     <FeedbackButton pergunta={p}/>
 

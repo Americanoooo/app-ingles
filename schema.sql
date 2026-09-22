@@ -13,9 +13,9 @@ CREATE TABLE quiz(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     dificuldade INT NOT NULL,
-    nota DECIMAL(4, 2) NOT NULL,
+    nota DECIMAL(4, 2)  NULL,
     data DATE NOT NULL,
-    total_perguntas INT NOT NULL,
+    total_perguntas INT  NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
@@ -25,8 +25,8 @@ CREATE TABLE pergunta(
     enunciado VARCHAR(1000) NOT NULL,
     categoria ENUM ("preposicao","tempo_verbal","contexto")NOT NULL,
     opcoes VARCHAR(1000) NOT NULL,
-    resposta_certa VARCHAR(1000)  NULL,
-    resposta_usuario VARCHAR(1000) ,
+    resposta_certa VARCHAR(1000) NOT NULL,
+    resposta_usuario VARCHAR(1000) NULL ,
     acertou BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (quiz_id) REFERENCES quiz(id)
     );
