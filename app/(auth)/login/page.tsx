@@ -53,12 +53,11 @@ function Login() {
       setErro('')
     }catch(err:unknown){
       setErro( err instanceof  Error ? err.message : 'Não foi possível realizar o cadastro')
-      console.log(err)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-200 p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
 
         <Card className="w-full max-w-sm px-3">
           <CardHeader>

@@ -26,7 +26,6 @@ function QuizUnico(){
     try{
         const data = await apiFetch(`/api/relatorio/${id}`)
         setQuiz(data.listaPerguntas)
-        console.log(data.listaPerguntas)
 
          }catch(error){
             setErro(error instanceof Error ? error.message : 'Não foi possível exibir o quiz')

@@ -53,7 +53,6 @@ function Relatorio(){
         try{
             const data = await apiFetch('/api/relatorio',)
             setQuiz(data.quizzes)
-            console.log(data.quizzes)
         }catch(error){
             setErro(error instanceof Error ? error.message : 'Não foi possível exibir o relatório.')
         }finally{

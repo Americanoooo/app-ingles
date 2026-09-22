@@ -3,7 +3,7 @@ import { getPool } from "./db";
 
 export async function relatorio(usuarioId: number){
     const [resultado] = await getPool().query<RowDataPacket[]>(
-        'SELECT * FROM quiz WHERE usuario_id = ? AND nota IS NOT NULL',
+        'SELECT * FROM quiz WHERE usuario_id = ? AND nota IS NOT NULL ORDER BY data DESC, id DESC',
         [usuarioId]
     )
     return resultado.map((quiz)=> ({
