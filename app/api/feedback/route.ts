@@ -1,5 +1,5 @@
 import * as z from "zod"; 
-import { badRequest, internalServerError } from "@/lib/respostas";
+import { badRequest, IAResponseError, internalServerError } from "@/lib/respostas";
 
 const RespostaIA = z.object({
     explicacao: z.string()
@@ -66,14 +66,15 @@ export async function POST(req: Request){
         })
         
         if(!resposta.ok){
-             throw new Error(`Erro na API: ${resposta.status} - ${resposta.statusText}`);
+            console.error('Falha na API do Gemini (gerar-perguntas):', resposta.status, resposta.statusText)
+            return IAResponseError()
         }
         const data = await resposta.json()
         const respostaFeedback = data.choices?.[0]?.message?.content;
 
         if(!respostaFeedback){
             console.error("O modelo retornou um conteúdo vazio.");
-            return internalServerError();
+            return IAResponseError();
         }
 
         let jsonValidado: unknown
@@ -81,14 +82,14 @@ export async function POST(req: Request){
             jsonValidado = JSON.parse(respostaFeedback);
         }catch(err: unknown){
             console.error("Falha ao parsear string JSON da IA:", respostaFeedback)
-            return internalServerError()
+            return IAResponseError()
         }
 
         const resultadoZod = await RespostaIA.safeParseAsync(jsonValidado)
 
         if(!resultadoZod.success){
             console.error("Zod falhou ao validar o formato da IA:", resultadoZod)
-            return internalServerError()
+            return IAResponseError()
         }
 
 

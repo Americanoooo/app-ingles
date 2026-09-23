@@ -30,11 +30,14 @@ function Login() {
 
   async function handleLogin(e: React.FormEvent){
     e.preventDefault()
+     if(!email || !senha){
+      return setErro('Preencha todos os campos')
+    }
     try{
        await  apiFetch('/api/login', {method: 'POST', body: JSON.stringify({email, senha})})
       router.push('/treino')
       }catch(err: unknown){
-        setErro( err instanceof  Error ? err.message : 'Erro ao efetuar login')
+        setErro( err instanceof  ApiError ? err.message : 'Erro ao efetuar login')
         setSenha('')
       }
   }

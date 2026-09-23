@@ -1,6 +1,6 @@
 import { cadastrarUsuario } from '@/lib/cadastrar.model'
 import { rateLimite } from '@/lib/rateLimite';
-import { badRequest, internalServerError, TooManyRequests } from '@/lib/respostas';
+import {  internalServerError, TooManyRequests } from '@/lib/respostas';
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 

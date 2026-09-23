@@ -89,9 +89,10 @@ export async function POST(req: Request) {
       }),
     },
   );
-  if(!resposta.ok){
-    throw new Error(`Erro na API: ${resposta.status} - ${resposta.statusText}`);
-  }
+    if(!resposta.ok){
+            console.error('Falha na API do Gemini (gerar-perguntas):', resposta.status, resposta.statusText)
+            return IAResponseError()
+        }
 
     const data = await resposta.json();
     const quizIA = data.choices[0].message.content
@@ -131,12 +132,12 @@ export async function POST(req: Request) {
           }
         }catch(err: unknown){
           console.error(err)
-          return badRequest()
+          return internalServerError()
         }
        
         
 
-      return Response.json(quizGravado, {status:200})
+      return Response.json(quizGravado, {status:201})
     }catch(err:unknown){
       const error = err instanceof Error ? err.message : 'Erro interno, tente novamente.'
       console.error(error)

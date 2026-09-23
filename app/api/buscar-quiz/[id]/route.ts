@@ -1,5 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth"
 import { buscarQuiz } from "@/lib/pergunta.model"
+import { internalServerError } from "@/lib/respostas"
 
 export async function GET(_req: Request, {params}:{params: Promise<{id: string}>}){
     try{
@@ -13,7 +14,8 @@ export async function GET(_req: Request, {params}:{params: Promise<{id: string}>
         return Response.json({resultado}, {status:200})
     }catch(err){
         console.error(err)
-        return Response.json({mensagem: "não deu certo a requisição"}, {status:500})
+        return internalServerError()
     }
+
 
 }

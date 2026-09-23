@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { FeedbackButton } from "@/app/components/FeedbackButton";
 import { DadosQuiz, Pergunta } from "@/types";
+import { ApiError } from "@/lib/apiError";
 
 
 
@@ -53,6 +54,9 @@ function Treino(){
     }
 
     async function handleEnviar(){
+        if(perguntas?.todasPerguntas.length !== Object.keys(respostas).length){
+            return setErroPerguntas('Preencha todas as perguntas.')
+        }
         try{
             const respostasQuiz = perguntas?.todasPerguntas.map((p, indexPergunta)=> ({
                 perguntaId: p.id,
@@ -68,8 +72,10 @@ function Treino(){
             setResultado(data.perguntasCompletas)
                 setAcertos(data.acertos)
                 setTela('resultado')
-        }catch{
-            setErroPerguntas('Preencha todas as perguntas.')
+        }catch(err:unknown){
+            const message = err instanceof ApiError ? err.message : "Não foi possível salvar o quiz, tente novamente."
+            setErroPerguntas(message)
+            console.error(err)
         }
     }
 

@@ -44,6 +44,7 @@ export async function POST(req: Request){
         return Response.json({mensagem: 'Usuario logado com sucesso'}, {status:200})
 
     }catch(err:unknown){
+        console.error(err)
         return internalServerError()
     }
 }
