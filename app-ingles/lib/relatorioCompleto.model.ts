@@ -16,7 +16,7 @@ export async function buscarRelatorioCompleto(quizId: number, usuarioId: number 
         opcoes: JSON.parse(pergunta.opcoes),
         respostaCerta: pergunta.resposta_certa,
         respostaUsuario: pergunta.resposta_usuario,
-        acertou: pergunta.acertou,
+        acertou: Boolean(pergunta.acertou),
         quizId: pergunta.quiz_id,
     }))
 

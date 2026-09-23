@@ -1,6 +1,6 @@
 import { cadastrarUsuario } from '@/lib/cadastrar.model'
 import { rateLimite } from '@/lib/rateLimite';
-import { badRequest, internalServerError, TooManyRequests } from '@/lib/respostas';
+import {  internalServerError, TooManyRequests } from '@/lib/respostas';
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
@@ -35,7 +35,7 @@ export async function POST(req: Request){
         const validacao = cadastrarSchema.safeParse(body)
 
         if(!validacao.success) {
-            return badRequest()
+            return Response.json({mensagem: validacao.error.issues[0].message}, {status:400})
         }
 
         const { email, nome, senha } = validacao.data
@@ -47,8 +47,6 @@ export async function POST(req: Request){
         if(err && typeof err === 'object' && 'code' in err && err.code === 'ER_DUP_ENTRY'){
             return Response.json({mensagem: 'Este email já está cadastrado'}, {status: 409})
         }
-        console.log(err)
-
         return internalServerError()
     }
 }

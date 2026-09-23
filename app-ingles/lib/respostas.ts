@@ -22,7 +22,7 @@ export function TooManyRequests(){
     return Response.json({mensagem: "Muitas solicitações, por favor, tente novamente mais tarde"}, {status:429})
 }
 
-export function NotFounded(){
+export function NotFound(){
     return Response.json({mensagem: "Não encontrado."}, {status:404})
 }
 

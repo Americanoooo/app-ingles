@@ -1,6 +1,6 @@
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "./db";
-import { QuizData, Pergunta, DadosQuiz, PerguntaBanco, AtualizarPergunta } from "@/types";
+import { QuizData, Pergunta, DadosQuiz, PerguntaBanco, PerguntaQuiz, AtualizarPergunta } from "@/types";
 
 export async function SalvarQuiz(quizData: QuizData, perguntas: Pergunta[]) {
   const conn = await getPool().getConnection();
@@ -10,7 +10,7 @@ export async function SalvarQuiz(quizData: QuizData, perguntas: Pergunta[]) {
 
 
   const [quiz] = await conn.query<ResultSetHeader>(
-    "INSERT INTO quiz (usuario_id, dificuldade, data, total_perguntas) VALUES (?,?,CURDATE(), ?)",
+    "INSERT INTO quiz (usuario_id, dificuldade,  total_perguntas, data) VALUES (?,?,?,CURDATE())",
     [quizData.usuarioId, quizData.dificuldade, perguntas.length],
   );
 
@@ -48,14 +48,23 @@ const dadosQuiz : DadosQuiz= {
   }
 }
 
-export async function buscarQuiz(quizId:number, usuarioId: number){
+export async function buscarQuiz(quizId:number, usuarioId: number): Promise<PerguntaQuiz[]>{
     const [resultado]= await getPool().query<PerguntaBanco[]>(
         `SELECT pergunta.* FROM pergunta
         JOIN quiz ON pergunta.quiz_id = quiz.id
          WHERE pergunta.quiz_id =? AND quiz.usuario_id =?`,
         [quizId, usuarioId]
     )
-    return resultado
+    return resultado.map((pergunta)=> ({
+        id: pergunta.id,
+        enunciado: pergunta.enunciado,
+        categoria: pergunta.categoria,
+        opcoes: JSON.parse(pergunta.opcoes),
+        respostaCerta: pergunta.resposta_certa,
+        respostaUsuario: pergunta.resposta_usuario,
+        acertou: Boolean(pergunta.acertou),
+        quizId: pergunta.quiz_id,
+    }))
 }
 
 export async function atualizarRespostas(quiz: AtualizarPergunta, usuarioId:number, notaCalculada:number){
@@ -71,7 +80,7 @@ export async function atualizarRespostas(quiz: AtualizarPergunta, usuarioId:numb
       for (const pergunta of quiz.perguntas){
        await conn.query(
           `UPDATE pergunta SET resposta_usuario = ?, acertou = ? WHERE id=?`,
-          [pergunta.resposta_usuario, pergunta.acertou, pergunta.id]
+          [pergunta.respostaUsuario, pergunta.acertou, pergunta.id]
         )
       }
       await conn.commit()

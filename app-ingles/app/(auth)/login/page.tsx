@@ -30,30 +30,37 @@ function Login() {
 
   async function handleLogin(e: React.FormEvent){
     e.preventDefault()
+     if(!email || !senha){
+      return setErro('Preencha todos os campos')
+    }
     try{
        await  apiFetch('/api/login', {method: 'POST', body: JSON.stringify({email, senha})})
       router.push('/treino')
       }catch(err: unknown){
-        setErro( err instanceof  Error ? err.message : 'Erro ao efetuar login')
+        setErro( err instanceof  ApiError ? err.message : 'Erro ao efetuar login')
         setSenha('')
       }
   }
 
   async function handleCadastrar(e: React.FormEvent){
+        if(!nome || !email || !senha){
+      return setErro('Preencha todos os campos')
+    }
     e.preventDefault()
     try{
+  
          await apiFetch('/api/cadastrar',
         {method: 'POST', body: JSON.stringify({nome, email,senha})}
       )
       setSucesso('Cadastro efetuado com sucesso')
       setErro('')
     }catch(err:unknown){
-      setErro( err instanceof  Error ? err.message : 'Erro ao cadastrar')
+      setErro( err instanceof  Error ? err.message : 'Não foi possível realizar o cadastro')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-200 p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
 
         <Card className="w-full max-w-sm px-3">
           <CardHeader>

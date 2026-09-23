@@ -1,6 +1,6 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import { atualizarRespostas, buscarQuiz } from "@/lib/pergunta.model";
-import { badRequest, calcularNota, internalServerError, NotFounded } from "@/lib/respostas";
+import { badRequest, calcularNota, internalServerError, NotFound } from "@/lib/respostas";
 import { z } from "zod";
 
 
@@ -35,7 +35,7 @@ export async function POST(req: Request){
     const quizBanco  = await buscarQuiz(quizId, usuarioId)
 
     if(quizBanco.length ===0){
-        return NotFounded()
+        return NotFound()
     }
 
     const todasRespondidas = quizBanco.every((p)=> {
@@ -51,8 +51,8 @@ export async function POST(req: Request){
        }
        return {
         ...pergunta,
-        resposta_usuario: resposta?.respostaUsuario,
-        acertou: resposta?.respostaUsuario === pergunta.resposta_certa
+        respostaUsuario: resposta.respostaUsuario,
+        acertou: resposta.respostaUsuario === pergunta.respostaCerta
        }
     })
 
