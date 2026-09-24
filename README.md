@@ -18,6 +18,9 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 ## ✨ Funcionalidades
 
 - **Autenticação completa** — cadastro e login com senha criptografada e sessão via cookie httpOnly (proteção contra roubo de token via XSS).
+
+  ![Tela de login](docs/login.PNG)
+
 - **Autorização por dono (anti-IDOR)** — cada usuário só vê os próprios quizzes; id de outro dono na URL não vaza dado (404 genérico, também anti-enumeração).
 - **Rate limiting** — limites por IP nas rotas públicas (login/cadastro) e por usuário nas autenticadas, com contadores independentes para as rotas que chamam a IA (mais caras) e para o restante.
 - **Geração de quiz por IA** — escolha de dificuldade e quantidade de perguntas; a IA gera questões de múltipla escolha nas categorias *preposição*, *tempo verbal* e *contexto*.
@@ -34,6 +37,8 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 
   ![Revisão de quiz](docs/relatorio.PNG)
 
+- **Limpeza automática** — rotina agendada diariamente remove quizzes gerados e nunca respondidos, consequência assumida do fluxo de persistir antes de corrigir.
+
 ---
 
 ## 🛠️ Tecnologias
@@ -41,7 +46,7 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 **Front-end:** Next.js (App Router) · React · TypeScript · Tailwind CSS + shadcn/ui
 **Back-end:** Next.js Route Handlers · MySQL (`mysql2`) · Zod · bcrypt · jose (JWT em cookie httpOnly)
 **IA:** Google Gemini (endpoint compatível com OpenAI), saída estruturada via `json_schema`
-**Infraestrutura:** Docker + Docker Compose · Upstash Redis (rate limiting) · Deploy: Vercel (app) + Aiven (MySQL)
+**Infraestrutura:** Docker + Docker Compose · Upstash Redis (rate limiting) · Vercel Cron · Deploy: Vercel (app) + Aiven (MySQL)
 
 ---
 
@@ -51,13 +56,21 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 
 A correção mudou o fluxo: `/api/gerar-perguntas` passou a persistir quiz e perguntas (com o gabarito) no momento da geração, dentro de uma transação, e devolve pro front apenas `quizId`, os ids das perguntas, enunciados e opções — a resposta certa nunca sai do servidor. O `/api/responder` recebe só `quizId` e os pares `{perguntaId, respostaUsuario}`, busca o gabarito real no banco com checagem de dono (JOIN por `usuario_id`), calcula acerto e nota, e faz o UPDATE. Nada que o cliente envie participa da decisão do que é certo — e, de quebra, o gabarito deixou de ficar visível no DevTools durante o quiz.
 
-**Trade-off que eu aceitei conscientemente.** Persistir o quiz antes de existir resposta significa aceitar linhas incompletas no banco: `nota`, `resposta_usuario` e `acertou` nascem nulos e só são preenchidos quando o usuário envia. Além de exigir que essas colunas fossem nullable, isso cria um efeito colateral: quizzes gerados e nunca respondidos ficam guardados. A alternativa (segurar tudo em memória até o envio) manteria o banco limpo, mas não sobrevive a um ambiente serverless, onde a próxima requisição pode cair em outra instância. Escolhi o dado incompleto em vez da falha de segurança, e lidei com as consequências: o relatório filtra por `nota IS NOT NULL`, e a limpeza dos quizzes abandonados está no roadmap.
+**Trade-off que eu aceitei conscientemente, e o que fiz com ele.** Persistir o quiz antes de existir resposta significa aceitar linhas incompletas no banco: `nota`, `resposta_usuario` e `acertou` nascem nulos e só são preenchidos quando o usuário envia. Além de exigir que essas colunas fossem nullable, isso cria um efeito colateral: quizzes gerados e nunca respondidos ficam guardados. A alternativa (segurar tudo em memória até o envio) manteria o banco limpo, mas não sobrevive a um ambiente serverless, onde a próxima requisição pode cair em outra instância. Escolhi o dado incompleto em vez da falha de segurança, e lidei com as consequências em dois lugares: o relatório filtra por `nota IS NOT NULL`, e uma rotina agendada apaga os abandonados.
+
+**A rotina de limpeza.** É uma rota (`/api/limpeza`) invocada por um Vercel Cron uma vez por dia. Três decisões que valem explicação:
+
+- **Autenticação por segredo compartilhado, não por sessão.** O cron é um robô e não tem cookie, então a rota compara o header `Authorization` com a variável `CRON_SECRET` — e por isso ela também fica de fora do matcher do middleware, que exige sessão. São dois mecanismos de identidade para dois tipos de cliente.
+- **Sem transação, de propósito.** A ordem importa (perguntas antes de quiz, por causa da FK), mas uma falha no meio deixa apenas quizzes sem perguntas, que continuam batendo no critério de abandonado e somem na execução seguinte. Falha parcial que se autocorrige não precisa de transação; o `SalvarQuiz`, onde o estado intermediário seria visível para o usuário, precisa.
+- **Margem de um dia no critério.** A limpeza só considera abandonado o que é anterior ao dia corrente, para nunca apagar um quiz que alguém está respondendo naquele momento.
 
 **Saída estruturada da IA (`json_schema`).** Resposta de LLM em texto livre é inconsistente na prática — e isso não é só estética: um parse que falha vira bug real na experiência do usuário (quiz não carrega, feedback trava). Por isso a geração das perguntas e o feedback por pergunta usam saída estruturada (`json_schema`, na chamada compatível com OpenAI ao Gemini) — o schema trava os campos que a IA precisa devolver, então o código lê cada um com confiança em vez de tentar adivinhar texto solto. Como camada extra, a resposta ainda passa por validação com Zod antes de qualquer gravação no banco — defesa em profundidade: o schema garante o formato na saída do LLM, o Zod garante que o que chega no back-end bate com o que o banco espera, mesmo que o provedor mude de comportamento.
 
 **Persistência atômica.** Quiz e perguntas precisam ser gravados como uma unidade: se a inserção de uma pergunta falhar no meio do caminho, sobra um quiz órfão no banco. Por isso `SalvarQuiz` e `atualizarRespostas` abrem uma transação (`beginTransaction` → queries → `commit`, com `rollback` no catch e `release` da conexão no `finally`). Todas as queries da transação rodam na **mesma conexão** obtida do pool — se cada uma pegasse uma conexão qualquer, o rollback de uma não teria efeito nenhum sobre o que já rodou em outra.
 
 **Uma convenção de nomes, convertida num lugar só.** O banco usa snake_case e o restante da aplicação usa camelCase. A conversão acontece dentro dos models (`lib/*.model.ts`), logo depois da query: rotas e front nunca veem nome de coluna. Antes disso, uma rota devolvia a linha crua do banco enquanto outras já convertiam, e o mesmo dado chegava com dois formatos diferentes dependendo da tela — origem de vários bugs silenciosos, porque o TypeScript não acusa quando a interface descreve um formato que o dado real não tem.
+
+**Erro tratado por camada.** O model lança, a rota traduz para HTTP e o front exibe. As funções em `lib/respostas.ts` concentram os status e as mensagens voltadas ao usuário; o detalhe técnico vai só para o log. No cliente, o `apiFetch` converte qualquer resposta com status de erro em um `ApiError` que carrega status e mensagem, e a tela usa `instanceof` para distinguir "o servidor respondeu com erro" de "a requisição nem chegou lá" — só no primeiro caso a mensagem do backend é exibida. No middleware, a mesma ideia separa o que é falha de autenticação (bloqueia) do que é falha de infraestrutura do rate limit (registra no log e deixa passar).
 
 ---
 
@@ -98,6 +111,7 @@ JWT_SECRET=uma_chave_secreta_longa
 GEMINI_API_KEY=sua_chave_do_gemini
 UPSTASH_REDIS_REST_URL=url_do_seu_redis
 UPSTASH_REDIS_REST_TOKEN=token_do_seu_redis
+CRON_SECRET=string_aleatoria_longa   # autentica a rota de limpeza
 ```
 
 > O `.env` está no `.gitignore` e não é versionado. A chave do Gemini é gratuita no Google AI Studio.
@@ -115,6 +129,7 @@ components/
 ├── ui/               # shadcn/ui
 lib/                  # models, conexão com o banco, helpers
 schema.sql            # estrutura do banco
+vercel.json           # agendamento do cron de limpeza
 docker-compose.yml
 dockerfile
 ```
@@ -123,8 +138,8 @@ dockerfile
 
 ## 🗺️ Roadmap
 
-- **Limpeza de quizzes abandonados** — rotina agendada para remover quizzes gerados e nunca respondidos, consequência assumida do fluxo de persistir antes de responder.
 - **Modo adaptativo** — gerar perguntas focadas nas categorias que o usuário mais erra, lendo o histórico de acertos.
+- **`data` como DATETIME** — hoje a coluna guarda só o dia, o que limita a ordenação do histórico e a granularidade da limpeza a intervalos de 24h.
 
 ---
 
@@ -136,6 +151,6 @@ dockerfile
 
 ## English summary
 
-Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js App Router, TypeScript, MySQL). The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Writes run inside a single DB transaction on one pooled connection. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
+Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js App Router, TypeScript, MySQL). The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. The accepted trade-off — rows that start incomplete, and abandoned quizzes that pile up — is handled by a daily Vercel Cron cleanup route, authenticated by a shared secret rather than by session. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Writes run inside a single DB transaction on one pooled connection. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
 
 Demo: https://app-ingles-bay.vercel.app/treino · Repo: github.com/Americanoooo/app-ingles
