@@ -53,6 +53,57 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Prévia do quiz na landing: uma única sequência ao carregar a página.
+   O estado final fica nas classes do componente; as animações só partem
+   do estado inicial (fill-mode both), então motion-reduce:animate-none
+   mostra direto a resposta corrigida. */
+@theme {
+    --animate-quiz-resposta: quiz-resposta 2.2s ease-out 0.6s both;
+    --animate-quiz-confirmar: quiz-confirmar 0.35s ease-out 2.3s both;
+    --animate-quiz-explicar: quiz-explicar 0.45s ease-out 2.7s both;
+
+    @keyframes quiz-resposta {
+        0%, 25% {
+            border-color: var(--border);
+            background-color: var(--background);
+        }
+        40%, 62% {
+            border-color: var(--primary);
+            background-color: var(--accent);
+        }
+        80%, 100% {
+            border-color: var(--success);
+            background-color: color-mix(in oklab, var(--success) 10%, transparent);
+        }
+    }
+
+    @keyframes quiz-confirmar {
+        0% {
+            opacity: 0;
+            transform: scale(0.4);
+        }
+        70% {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes quiz-explicar {
+        from {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
 :root {
     --background: #FFF9F2;
     --foreground: #1F2430;

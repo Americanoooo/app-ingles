@@ -3,18 +3,20 @@
 import { ApiError } from "@/lib/apiError";
 import { apiFetch } from "@/lib/apiFetch";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 
-function Login() {
+function Login({ searchParams }: PageProps<"/login">) {
+  // A landing abre direto no cadastro com /login?modo=cadastro
+  const { modo } = use(searchParams);
   const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
   const [senha, setSenha] = useState("");
 
-  const [cadastrar, setCadastrar] = useState(false);
+  const [cadastrar, setCadastrar] = useState(modo === "cadastro");
   const [erro, setErro]= useState('')
   const [sucesso, setSucesso]= useState('')
   const router = useRouter()

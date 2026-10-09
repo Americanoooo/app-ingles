@@ -4,7 +4,7 @@ import { rateLimite } from "./lib/rateLimite";
 import { TooManyRequests, unauthorized } from "./lib/respostas";
 
 export const config = {
-  matcher: ["/api/((?!login|cadastrar|me|limpeza).*)"],
+  matcher: ["/api/((?!login|cadastrar|me|limpeza|visitante).*)"],
 };
 
 export default async function proxy(request: NextRequest) {
