@@ -1,5 +1,5 @@
-import { apagarPerguntasAbandonadas, apagarQuizzesAbandonados } from "@/lib/cron";
-import { unauthorized } from "@/lib/respostas";
+import { apagarHistoricoVisitante, apagarPerguntasAbandonadas, apagarQuizzesAbandonados } from "@/lib/cron";
+import { internalServerError, unauthorized } from "@/lib/respostas";
 
 
 export async function GET (req: Request){
@@ -10,9 +10,11 @@ export async function GET (req: Request){
     try{
         const perguntas = await apagarPerguntasAbandonadas()
         const quizzes = await apagarQuizzesAbandonados()
+        const visitante = await apagarHistoricoVisitante()
 
-        return Response.json({mensagem: `total de quizzes deletados ${quizzes.affectedRows}, total de perguntas ${perguntas.affectedRows}`}, {status:200})
+        return Response.json({mensagem: `total de quizzes deletados ${quizzes.affectedRows}, total de perguntas ${perguntas.affectedRows}, visitante: ${visitante.quizzes} quizzes e ${visitante.perguntas} perguntas`}, {status:200})
     }catch(err){
         console.error(err)
+        return internalServerError()
     }
 }
