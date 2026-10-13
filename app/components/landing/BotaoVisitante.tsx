@@ -4,16 +4,11 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { apiFetch } from "@/lib/apiFetch";
 
 const ERRO_PADRAO =
   "Não foi possível entrar como visitante. Tente de novo ou crie uma conta.";
 
-/**
- * Contrato esperado do back-end: POST /api/visitante cria a sessão (cookie
- * "session") e responde 2xx; em caso de erro responde { mensagem }.
- * Usa fetch direto em vez de apiFetch porque o apiFetch redireciona para
- * /login em qualquer 401.
- */
 export function BotaoVisitante() {
   const router = useRouter();
   const [carregando, setCarregando] = useState(false);
@@ -23,25 +18,7 @@ export function BotaoVisitante() {
     setErro("");
     setCarregando(true);
     try {
-      const res = await fetch("/api/visitante", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        let mensagem = ERRO_PADRAO;
-        // 401 e 404 aqui significam que a rota ainda não está disponível.
-        if (res.status !== 401 && res.status !== 404) {
-          try {
-            const data = await res.json();
-            if (data?.mensagem) mensagem = data.mensagem;
-          } catch {}
-        }
-        setErro(mensagem);
-        setCarregando(false);
-        return;
-      }
-
+      await apiFetch("/api/visitante", { method: "POST" });
       router.push("/treino");
     } catch {
       setErro(ERRO_PADRAO);

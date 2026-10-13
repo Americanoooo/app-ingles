@@ -30,3 +30,6 @@ CREATE TABLE pergunta(
     acertou BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (quiz_id) REFERENCES quiz(id)
     );
+
+-- Conta usada pelo botão "Entrar como visitante" (/api/visitante). A senha nunca é conferida.
+INSERT INTO usuario (nome, email, senha_hash) VALUES ("Visitante", "visitante@visitante.com", "!");
