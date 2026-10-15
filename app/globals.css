@@ -65,6 +65,19 @@
     --animate-quiz-resposta: quiz-resposta 2.2s ease-out 0.6s both;
     --animate-quiz-confirmar: quiz-confirmar 0.35s ease-out 2.3s both;
     --animate-quiz-explicar: quiz-explicar 0.45s ease-out 2.7s both;
+    /* Título e subtítulo da landing: abrem a mesma sequência. A duração e o
+       atraso de cada palavra vêm inline do TituloEscrito. */
+    --animate-escrever: escrever 0.4s linear both;
+    --animate-surgir: quiz-explicar 0.5s ease-out both;
+
+    @keyframes escrever {
+        from {
+            mask-position: 100% 0;
+        }
+        to {
+            mask-position: 0% 0;
+        }
+    }
 
     @keyframes quiz-resposta {
         0%, 25% {

@@ -7,6 +7,9 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./components/Logo";
 import { BotaoVisitante } from "./components/landing/BotaoVisitante";
 import { QuizPreview } from "./components/landing/QuizPreview";
+import { TituloEscrito, duracaoEscrita } from "./components/landing/TituloEscrito";
+
+const titulo = "Treine seu inglês com inteligência artificial";
 
 async function estaLogado() {
   const cookieStore = await cookies();
@@ -33,9 +36,12 @@ export default async function Home() {
       <main className="mx-auto grid w-full max-w-5xl flex-1 content-center gap-10 px-4 pt-6 pb-16 sm:px-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-x-16 lg:gap-y-12">
         <section className="flex flex-col gap-5 lg:col-start-1 lg:row-start-1">
           <h1 className="max-w-[14ch] font-heading text-4xl leading-[1.05] font-bold tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl">
-            Treine seu inglês com inteligência artificial
+            <TituloEscrito texto={titulo} />
           </h1>
-          <p className="max-w-md text-lg text-pretty text-muted-foreground">
+          <p
+            style={{ animationDelay: `${duracaoEscrita(titulo) - 200}ms` }}
+            className="max-w-md animate-surgir text-lg text-pretty text-muted-foreground motion-reduce:animate-none"
+          >
             A IA cria quizzes no seu nível, explica cada resposta em português
             e mostra no relatório o que você precisa revisar.
           </p>
