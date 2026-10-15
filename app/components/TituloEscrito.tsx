@@ -1,25 +1,25 @@
 import { Fragment } from "react";
 
-/** Ritmo da escrita: quanto cada letra leva para aparecer, em ms. */
+/** Ritmo padrão da escrita: quanto cada letra leva para aparecer, em ms. */
 const MS_POR_LETRA = 22;
 
-function planejar(texto: string) {
+function planejar(texto: string, msPorLetra = MS_POR_LETRA) {
   let inicio = 0;
   return texto.split(" ").map((palavra) => {
     const passo = {
       palavra,
       atraso: inicio,
       // A borda suave da máscara precisa de mais tempo que a palavra para atravessá-la.
-      duracao: Math.max(palavra.length * MS_POR_LETRA * 1.8, 240),
+      duracao: Math.max(palavra.length * msPorLetra * 1.8, 240),
     };
-    inicio += (palavra.length + 1) * MS_POR_LETRA;
+    inicio += (palavra.length + 1) * msPorLetra;
     return passo;
   });
 }
 
 /** Quando a última palavra termina de aparecer, em ms. */
-export function duracaoEscrita(texto: string) {
-  const ultima = planejar(texto).at(-1);
+export function duracaoEscrita(texto: string, msPorLetra = MS_POR_LETRA) {
+  const ultima = planejar(texto, msPorLetra).at(-1);
   return ultima ? ultima.atraso + ultima.duracao : 0;
 }
 
@@ -29,8 +29,15 @@ export function duracaoEscrita(texto: string) {
  * borda suave, então o kerning da fonte continua intacto. Só CSS: funciona
  * em Server Component e, com movimento reduzido, o texto já aparece pronto.
  */
-export function TituloEscrito({ texto }: { texto: string }) {
-  const palavras = planejar(texto);
+export function TituloEscrito({
+  texto,
+  msPorLetra = MS_POR_LETRA,
+}: {
+  texto: string;
+  /** Frases curtas ficam melhores com um ritmo mais lento. */
+  msPorLetra?: number;
+}) {
+  const palavras = planejar(texto, msPorLetra);
   return (
     <>
       <span className="sr-only">{texto}</span>

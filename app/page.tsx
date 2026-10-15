@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Logo } from "./components/Logo";
 import { BotaoVisitante } from "./components/landing/BotaoVisitante";
 import { QuizPreview } from "./components/landing/QuizPreview";
-import { TituloEscrito, duracaoEscrita } from "./components/landing/TituloEscrito";
+import { TituloEscrito, duracaoEscrita } from "./components/TituloEscrito";
 
 const titulo = "Treine seu inglês com inteligência artificial";
 
