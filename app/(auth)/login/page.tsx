@@ -74,11 +74,11 @@ function Login({ searchParams }: PageProps<"/login">) {
     setEnviando(true)
     try{
        await  apiFetch('/api/login', {method: 'POST', body: JSON.stringify({email, senha})})
+      // Sem resetar o enviando no sucesso: o botão fica travado até a navegação terminar
       router.push('/treino')
       }catch(err: unknown){
         setErro( err instanceof  ApiError ? err.message : 'Erro ao efetuar login')
         setSenha('')
-      }finally{
         setEnviando(false)
       }
   }
@@ -109,7 +109,7 @@ function Login({ searchParams }: PageProps<"/login">) {
       <header className="mx-auto flex h-16 w-full max-w-5xl items-center px-4 sm:px-8">
         <Link
           href="/"
-          aria-label="App Inglês, voltar para o início"
+          aria-label="AI Fluency, voltar para o início"
           className="rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <Logo comMarca />
@@ -233,7 +233,8 @@ function Login({ searchParams }: PageProps<"/login">) {
             <button
               type="button"
               onClick={trocarModo}
-              className="rounded-md font-bold text-foreground underline decoration-primary decoration-2 underline-offset-4 outline-none hover:decoration-primary-hover focus-visible:ring-3 focus-visible:ring-ring/50"
+              disabled={enviando}
+              className="rounded-md font-bold text-foreground underline decoration-primary disabled:pointer-events-none disabled:opacity-50 decoration-2 underline-offset-4 outline-none hover:decoration-primary-hover focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {t.trocaAcao}
             </button>

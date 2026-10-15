@@ -31,7 +31,7 @@ export function BotaoVisitante() {
       <Button
         variant="ghost"
         size="lg"
-        className="w-full rounded-full"
+        className="w-full cursor-pointer rounded-full"
         onClick={entrarComoVisitante}
         disabled={carregando}
       >

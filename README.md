@@ -1,4 +1,4 @@
-# App Inglês 🇬🇧
+# AI Fluency 🇬🇧
 
 Treinador de inglês full-stack com quiz e feedback gerados por IA — a nota é sempre calculada no servidor, a partir do gabarito que está no banco, nunca de dado enviado pelo cliente.
 
