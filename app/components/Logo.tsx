@@ -1,5 +1,9 @@
 import { cn } from "@/lib/utils";
 
+/** Contorno do balão de fala do ícone do app (viewBox 0 0 64 64). */
+export const caminhoBalao =
+  "M14 4h36a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10H30l-12 10v-10h-4A10 10 0 0 1 4 40V14A10 10 0 0 1 14 4z";
+
 type LogoProps = {
   className?: string;
   /** Mostra o balão de fala do ícone do app ao lado do nome. */
@@ -22,7 +26,7 @@ export function Logo({ className, comMarca = false }: LogoProps) {
         >
           <path
             className="fill-primary"
-            d="M14 4h36a10 10 0 0 1 10 10v26a10 10 0 0 1-10 10H30l-12 10v-10h-4A10 10 0 0 1 4 40V14A10 10 0 0 1 14 4z"
+            d={caminhoBalao}
           />
           <path
             className="fill-primary-foreground"

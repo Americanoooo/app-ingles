@@ -41,7 +41,7 @@ export function BotaoVisitante() {
       <p className="text-center text-xs text-muted-foreground">
         Teste sem cadastro. Seu histórico não fica salvo.
       </p>
-      <p aria-live="polite" className="text-center text-sm font-medium text-destructive empty:hidden">
+      <p aria-live="polite" className="text-center text-sm font-semibold text-destructive-strong empty:hidden">
         {erro}
       </p>
     </div>

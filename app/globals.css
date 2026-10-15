@@ -8,6 +8,10 @@
     --font-heading: var(--font-fredoka);
     --font-sans: var(--font-nunito);
     --color-success: var(--success);
+    --color-success-strong: var(--success-strong);
+    --color-warning-strong: var(--warning-strong);
+    --color-destructive-strong: var(--destructive-strong);
+    --color-primary-strong: var(--primary-strong);
     --color-success-foreground: var(--success-foreground);
     --color-warning: var(--warning);
     --color-warning-foreground: var(--warning-foreground);
@@ -92,6 +96,50 @@
         }
     }
 
+    /* Treino: retorno às ações de quem responde. */
+    --animate-opcao-marcada: opcao-marcada 0.22s ease-out;
+    --animate-selo: quiz-confirmar 0.35s ease-out both;
+    --animate-placar-pulo: placar-pulo 0.5s ease-out both;
+    --animate-digitando: digitando 1.2s ease-in-out infinite both;
+
+    @keyframes opcao-marcada {
+        0% {
+            transform: scale(0.97);
+        }
+        60% {
+            transform: scale(1.015);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes placar-pulo {
+        0% {
+            transform: scale(1);
+        }
+        40% {
+            transform: scale(1.18);
+        }
+        70% {
+            transform: scale(0.96);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes digitando {
+        0%, 60%, 100% {
+            opacity: 0.45;
+            transform: translateY(0);
+        }
+        30% {
+            opacity: 1;
+            transform: translateY(-60%);
+        }
+    }
+
     @keyframes quiz-explicar {
         from {
             opacity: 0;
@@ -124,6 +172,13 @@
     --destructive: #FF4D5E;
     --success: #2FBF71;
     --success-foreground: #FFFFFF;
+    /* Versões escuras para texto: >= 4.5:1 sobre o fundo, o card e o
+       próprio tom claro (ex.: text-success-strong sobre bg-success/15).
+       Fundos de botão continuam com --primary. */
+    --primary-strong: #B93E0A;
+    --success-strong: #147A44;
+    --warning-strong: #8A5A00;
+    --destructive-strong: #C81E36;
     --warning: #FFC23D;
     --warning-foreground: #1F2430;
     --border: #E8E1D9;
@@ -161,6 +216,10 @@
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
     --destructive: oklch(0.704 0.191 22.216);
+    --primary-strong: #FFA066;
+    --success-strong: #5FD99A;
+    --warning-strong: #FFD166;
+    --destructive-strong: #FF8A95;
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.556 0 0);

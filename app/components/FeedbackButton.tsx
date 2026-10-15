@@ -6,6 +6,7 @@ import { apiFetch } from "@/lib/apiFetch";
 import {  Pergunta } from "@/types";
 import { useState } from "react";
 import { Lightbulb, Loader2 } from "lucide-react";
+import { BalaoDigitando } from "./BalaoDigitando";
 
 
 
@@ -57,19 +58,19 @@ export function FeedbackButton({pergunta}: FeedbackProps){
             <DialogContent>
 
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg text-primary">
+            <DialogTitle className="flex items-center gap-2 text-lg text-primary-strong">
                 <Lightbulb className="size-5" />
                 Explicação
             </DialogTitle>
             </DialogHeader>
 
           {carregando ? (
-            <div className="flex flex-col items-center gap-2 py-4 text-center">
-                <Loader2 className="size-6 animate-spin text-primary" />
+            <div role="status" className="flex flex-col items-center gap-2 py-4 text-center">
+                <BalaoDigitando className="size-12" />
                 <p className="text-sm text-muted-foreground">Gerando explicação...</p>
             </div>
           ) : erro ? (
-            <p className="text-sm font-medium text-destructive">{erro}</p>
+            <p role="alert" className="text-sm font-semibold text-destructive-strong">{erro}</p>
           ) : (
             <p className="text-base leading-7 text-foreground">{explicacao}</p>
           )}
