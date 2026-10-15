@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiFetch } from "@/lib/apiFetch";
+import { ApiError } from "@/lib/apiError";
 import {  Pergunta } from "@/types";
 import { useState } from "react";
 import { Lightbulb, Loader2 } from "lucide-react";
@@ -39,9 +40,9 @@ export function FeedbackButton({pergunta}: FeedbackProps){
                 }),
             });
             setExplicacao(data.explicacao)
-        }catch(err){
+        }catch(err: unknown){
             console.error(err)
-                setErro("Não foi possível gerar a explicação. Tente novamente.");
+            setErro(err instanceof ApiError ? err.message : "Não foi possível gerar a explicação. Tente novamente.");
         }finally{
             setCarregando(false)
         }

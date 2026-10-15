@@ -47,6 +47,7 @@ export async function POST(req: Request){
         if(err && typeof err === 'object' && 'code' in err && err.code === 'ER_DUP_ENTRY'){
             return Response.json({mensagem: 'Este email já está cadastrado'}, {status: 409})
         }
+        console.error(err)
         return internalServerError()
     }
 }

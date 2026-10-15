@@ -38,6 +38,7 @@ export async function apagarHistoricoVisitante(){
         await conexao.commit()
         return {perguntas: perguntas.affectedRows, quizzes: quizzes.affectedRows}
     }catch(err){
+        console.error('Falha ao apagar histórico do visitante, fazendo rollback:', err)
         await conexao.rollback()
         throw err
     }finally{

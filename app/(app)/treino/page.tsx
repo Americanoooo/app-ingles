@@ -63,8 +63,9 @@ function Treino(){
         setTela('quiz')
 
 
-        }catch{
-            setErro('Não foi possível gerar o quiz. Tente novamente em instantes.')
+        }catch(err: unknown){
+            console.error(err)
+            setErro(err instanceof ApiError ? err.message : 'Não foi possível gerar o quiz. Tente novamente em instantes.')
         }finally{
             setCarregando(false)
 
