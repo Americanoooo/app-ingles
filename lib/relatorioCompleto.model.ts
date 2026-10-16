@@ -6,7 +6,7 @@ export async function buscarRelatorioCompleto(quizId: number, usuarioId: number 
     const [resultado]= await getPool().query<RowDataPacket[]>(
         `SELECT pergunta.* FROM pergunta
         JOIN quiz ON pergunta.quiz_id = quiz.id
-         WHERE pergunta.quiz_id =? AND quiz.usuario_id =?`,
+         WHERE pergunta.quiz_id =? AND quiz.usuario_id =? AND quiz.nota IS NOT NULL`,
         [quizId, usuarioId]
     )
     return resultado.map((pergunta)=> ({
