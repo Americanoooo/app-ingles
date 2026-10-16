@@ -9,6 +9,7 @@ import { CircleAlert, CircleCheck, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/app/components/Logo";
+import { TituloEscrito, duracaoEscrita } from "@/app/components/TituloEscrito";
 
 // Saudação em inglês com a tradução embaixo, no mesmo espírito do app:
 // inglês primeiro, explicação em português logo depois.
@@ -33,6 +34,9 @@ const textos = {
   },
 };
 
+/** A saudação é curta, então é escrita num ritmo mais lento que o da landing. */
+const MS_POR_LETRA_SAUDACAO = 40;
+
 const classeInput =
   "h-12 rounded-2xl border-2 bg-background px-4 text-base md:text-base dark:bg-input/30";
 
@@ -51,6 +55,7 @@ function Login({ searchParams }: PageProps<"/login">) {
   const router = useRouter()
 
   const t = cadastrar ? textos.cadastro : textos.login
+  const fimSaudacao = duracaoEscrita(t.saudacao, MS_POR_LETRA_SAUDACAO)
 
   function limparForm(){
     setErro('')
@@ -117,21 +122,28 @@ function Login({ searchParams }: PageProps<"/login">) {
       </header>
 
       <main className="mx-auto grid w-full max-w-5xl flex-1 content-center gap-8 px-4 pt-4 pb-16 sm:px-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center lg:gap-16">
-        {/* key troca a cada modo para a saudação reaparecer com a animação */}
+        {/* key troca a cada modo para a saudação ser escrita de novo.
+            A saudação em inglês é escrita primeiro; a tradução vem logo depois. */}
         <section
           key={cadastrar ? "cadastro" : "login"}
-          className="flex animate-in flex-col gap-3 duration-300 fade-in slide-in-from-bottom-2 motion-reduce:animate-none"
+          className="flex flex-col gap-3"
         >
           <h1
             lang="en"
             className="font-heading text-4xl leading-[1.05] font-bold tracking-tight text-balance text-foreground sm:text-6xl lg:text-7xl"
           >
-            {t.saudacao}
+            <TituloEscrito texto={t.saudacao} msPorLetra={MS_POR_LETRA_SAUDACAO} />
           </h1>
-          <p className="font-heading text-xl font-semibold text-foreground/80 sm:text-2xl">
+          <p
+            style={{ animationDelay: `${fimSaudacao - 150}ms` }}
+            className="animate-surgir font-heading text-xl font-semibold text-foreground/80 motion-reduce:animate-none sm:text-2xl"
+          >
             {t.traducao}
           </p>
-          <p className="max-w-sm text-base text-pretty text-muted-foreground sm:text-lg">
+          <p
+            style={{ animationDelay: `${fimSaudacao + 50}ms` }}
+            className="max-w-sm animate-surgir text-base text-pretty text-muted-foreground motion-reduce:animate-none sm:text-lg"
+          >
             {t.apoio}
           </p>
         </section>
