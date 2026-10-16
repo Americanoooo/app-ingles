@@ -30,6 +30,8 @@ export async function POST(req: Request){
          return badRequest()
         }
 
+        
+
     const {quizId, respostasQuiz} = parse.data
 
     const quizBanco  = await buscarQuiz(quizId, usuarioId)
@@ -45,10 +47,14 @@ export async function POST(req: Request){
         return badRequest()
     }
     const perguntasCompletas = quizBanco.map((pergunta)=> {
+        
        const resposta = respostasQuiz.find((p)=> p.perguntaId === pergunta.id)
        if(!resposta) {
         throw new Error('Pergunta sem resposta correspondente')
        }
+       if(!pergunta.opcoes.includes(resposta.respostaUsuario)){
+            throw new Error('Resposta do usuário inválida')
+        }
        return {
         ...pergunta,
         respostaUsuario: resposta.respostaUsuario,
