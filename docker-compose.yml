@@ -30,7 +30,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL}
       UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
-    depends_on: 
+      CRON_SECRET: ${CRON_SECRET}
+    depends_on:
       - db
 
 volumes:
