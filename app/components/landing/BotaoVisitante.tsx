@@ -39,7 +39,7 @@ export function BotaoVisitante() {
         {carregando ? "Entrando..." : "Entrar como visitante"}
       </Button>
       <p className="text-center text-xs text-muted-foreground">
-        Teste sem cadastro. Seu histórico não fica salvo.
+        Teste sem cadastro.
       </p>
       <p aria-live="polite" className="text-center text-sm font-semibold text-destructive-strong empty:hidden">
         {erro}
