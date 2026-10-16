@@ -16,7 +16,7 @@ import { Lightbulb, Loader2 } from "lucide-react";
 
 export function FeedbackButton({pergunta}: FeedbackProps){
     const [aberto, setAberto]= useState(false)
-    const [carregando, setCarregando]=useState(true)
+    const [carregando, setCarregando]=useState(false)
     const [erro,setErro]=useState('')
     const [explicacao, setExplicacao]=useState('')
 
@@ -48,9 +48,9 @@ export function FeedbackButton({pergunta}: FeedbackProps){
     return(
         <>
         <div className="flex justify-center sm:justify-start">
-        <Button variant="outline" size="sm" className="w-full gap-1.5 rounded-full sm:w-auto" onClick={handleFeedback}>
-            <Lightbulb className="size-4" />
-            Ver explicação
+        <Button variant="outline" size="sm" className="w-full gap-1.5 rounded-full sm:w-auto" onClick={handleFeedback} disabled={carregando}>
+            {carregando ? <Loader2 className="size-4 animate-spin" /> : <Lightbulb className="size-4" />}
+            {carregando ? "Gerando..." : "Ver explicação"}
         </Button>
         </div>
         <Dialog open={aberto} onOpenChange={setAberto}>

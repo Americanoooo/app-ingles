@@ -31,8 +31,8 @@ export function Logo({ className, comMarca = false }: LogoProps) {
           />
         </svg>
       )}
-      <span>
-        App <span className="text-primary">Inglês</span>
+      <span lang="en">
+        <span className="text-primary">AI</span> Fluency
       </span>
     </span>
   );

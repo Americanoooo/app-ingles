@@ -15,7 +15,7 @@ const nunito = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "App Inglês",
+  title: "AI Fluency",
   description: "Treine seu inglês com inteligência artificial.",
 
 };

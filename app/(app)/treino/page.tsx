@@ -19,6 +19,7 @@ function Treino(){
     const [tela, setTela]= useState<"setup" | "quiz"| "resultado">("setup")
 
     const [carregando, setCarregando]=useState(false)
+    const [enviando, setEnviando]=useState(false)
 
     const [perguntas, setPerguntas]=useState<DadosQuiz | null>(null)
     const [acertos, setAcertos]= useState(0)
@@ -57,6 +58,7 @@ function Treino(){
         if(perguntas?.todasPerguntas.length !== Object.keys(respostas).length){
             return setErroPerguntas('Preencha todas as perguntas.')
         }
+        setEnviando(true)
         try{
             const respostasQuiz = perguntas?.todasPerguntas.map((p, indexPergunta)=> ({
                 perguntaId: p.id,
@@ -76,6 +78,8 @@ function Treino(){
             const message = err instanceof ApiError ? err.message : "Não foi possível salvar o quiz, tente novamente."
             setErroPerguntas(message)
             console.error(err)
+        }finally{
+            setEnviando(false)
         }
     }
 
@@ -160,6 +164,7 @@ function Treino(){
                                 variant={respostas[indexPergunta] === o ? "default" : "outline"}
                                 size="lg"
                                 onClick={()=> setRespostas({... respostas, [indexPergunta]: o})}
+                                disabled={enviando}
                                 className="w-full justify-start text-left h-auto py-3 rounded-2xl whitespace-normal">{o}</Button>
 
                             ))}
@@ -171,7 +176,10 @@ function Treino(){
                         </div>
 
                         <CardFooter className="shrink-0">
-                    <Button onClick={handleEnviar} size="lg" className="w-full rounded-full">Enviar respostas</Button>
+                    <Button onClick={handleEnviar} size="lg" className="w-full rounded-full" disabled={enviando}>
+                        {enviando && <Loader2 className="animate-spin" />}
+                        {enviando ? "Enviando..." : "Enviar respostas"}
+                    </Button>
 
                         </CardFooter>
                     </Card>
