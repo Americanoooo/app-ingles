@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
+import { SeloResultado } from "@/app/components/SeloResultado"
 import {  Pergunta } from "@/types";
 import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 
@@ -53,7 +54,7 @@ function QuizUnico(){
                             <ArrowLeft className="size-4" />
                             Voltar
                         </Link>
-                        <CardTitle className="font-heading text-lg font-bold text-foreground">Detalhes do quiz</CardTitle>
+                        <CardTitle className="font-heading text-xl font-bold text-foreground">Detalhes do quiz</CardTitle>
                     </div>
                 </CardHeader>
 
@@ -80,8 +81,11 @@ function QuizUnico(){
                             <div className="flex items-start gap-3">
                             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary font-heading text-sm font-bold text-primary-foreground">{indexPergunta + 1}</span>
                             <div className="flex flex-1 flex-col gap-1.5 pt-0.5">
-                            <p className="text-base font-semibold text-foreground">{p.enunciado}</p>
+                            <p lang="en" className="font-heading text-lg font-semibold leading-snug text-foreground">{p.enunciado}</p>
+                            <div className="flex flex-wrap items-center gap-2">
                             <span className="w-fit rounded-full bg-muted px-2.5 py-1 text-xs font-bold capitalize text-muted-foreground">{p.categoria.replace(/_/g, " ")}</span>
+                            <SeloResultado acertou={p.acertou === true} />
+                            </div>
                             </div>
                             </div>
 
@@ -90,8 +94,8 @@ function QuizUnico(){
                                 ? "border-success bg-success/10"
                                 : "border-destructive bg-destructive/10"
                                 }`}>
-                                <p className="text-foreground"><span className="font-semibold text-muted-foreground">Sua resposta: </span>{p.respostaUsuario}</p>
-                                <p className="font-semibold text-foreground"><span className="font-semibold text-muted-foreground">Resposta certa: </span>{p.respostaCerta}</p>
+                                <p className="text-foreground"><span className="font-semibold text-muted-foreground">Sua resposta: </span><span lang="en">{p.respostaUsuario}</span></p>
+                                <p className="font-semibold text-foreground"><span className="font-semibold text-muted-foreground">Resposta certa: </span><span lang="en">{p.respostaCerta}</span></p>
                                 </div>
 
                                <FeedbackButton pergunta={p}/>
