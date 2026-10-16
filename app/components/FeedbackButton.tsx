@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiFetch } from "@/lib/apiFetch";
 import { ApiError } from "@/lib/apiError";
-import {  Pergunta } from "@/types";
+import { PerguntaQuiz } from "@/types";
 import { useState } from "react";
 import { Lightbulb, Loader2 } from "lucide-react";
 import { BalaoDigitando } from "./BalaoDigitando";
@@ -12,7 +12,7 @@ import { BalaoDigitando } from "./BalaoDigitando";
 
 
     interface FeedbackProps{
-        pergunta: Pergunta
+        pergunta: PerguntaQuiz
     }
 
 
@@ -32,12 +32,7 @@ export function FeedbackButton({pergunta}: FeedbackProps){
         try{
             const data = await apiFetch('/api/feedback',{
                 method:"POST",
-                body: JSON.stringify({
-                    enunciado: pergunta.enunciado,
-                    respostaCerta: pergunta.respostaCerta,
-                    respostaUsuario:pergunta.respostaUsuario,
-                    categoria: pergunta.categoria
-                }),
+                body: JSON.stringify({ perguntaId: pergunta.id }),
             });
             setExplicacao(data.explicacao)
         }catch(err: unknown){
