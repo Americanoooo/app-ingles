@@ -39,6 +39,7 @@ const dadosQuiz : DadosQuiz= {
   await conn.commit()
   return dados[0]
   }catch(err: unknown){
+    console.error('Falha ao salvar quiz, fazendo rollback:', err)
     await conn.rollback()
     throw err
   }finally{
@@ -86,6 +87,7 @@ export async function atualizarRespostas(quiz: AtualizarPergunta, usuarioId:numb
       await conn.commit()
 
    }catch(err: unknown){
+          console.error('Falha ao atualizar respostas, fazendo rollback:', err)
           await conn.rollback()
           throw err
    }finally{
