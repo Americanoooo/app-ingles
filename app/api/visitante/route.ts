@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function POST(){
 
     try{
-        const email = "visitante@gmail.com"
+        const email = "visitante@visitante.com"
 
         const usuario = await login(email)
         if(!usuario){
