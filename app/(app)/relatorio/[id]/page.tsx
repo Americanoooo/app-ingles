@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import {  buttonVariants } from "@/components/ui/button";
 import {FeedbackButton} from "@/app/components/FeedbackButton"
 import { SeloResultado } from "@/app/components/SeloResultado"
-import {  Pergunta } from "@/types";
+import { PerguntaQuiz } from "@/types";
 import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 
 
@@ -17,7 +17,7 @@ function QuizUnico(){
     const params = useParams()
     const id = params.id
 
-    const [quiz, setQuiz]=useState<Pergunta[]>([])
+    const [quiz, setQuiz]=useState<PerguntaQuiz[]>([])
     const [carregando, setCarregando]=useState(true)
     const [erro, setErro]=useState('')
 

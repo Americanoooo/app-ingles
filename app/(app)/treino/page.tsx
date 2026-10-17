@@ -10,7 +10,7 @@ import { FeedbackButton } from "@/app/components/FeedbackButton";
 import { BalaoDigitando } from "@/app/components/BalaoDigitando";
 import { Placar, DURACAO_CONTAGEM } from "@/app/components/Placar";
 import { SeloResultado } from "@/app/components/SeloResultado";
-import { DadosQuiz, Pergunta } from "@/types";
+import { DadosQuiz, PerguntaQuiz } from "@/types";
 import { ApiError } from "@/lib/apiError";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ function Treino(){
 
     const [respostas, setRespostas] = useState<Record<number, string>>({})
 
-    const [resultado, setResultado] = useState<Pergunta[]>([]);
+    const [resultado, setResultado] = useState<PerguntaQuiz[]>([]);
 
     const [erro, setErro]=useState('')
 
