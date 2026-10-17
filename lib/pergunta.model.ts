@@ -53,7 +53,7 @@ export async function buscarQuiz(quizId:number, usuarioId: number): Promise<Perg
     const [resultado]= await getPool().query<PerguntaBanco[]>(
         `SELECT pergunta.* FROM pergunta
         JOIN quiz ON pergunta.quiz_id = quiz.id
-         WHERE pergunta.quiz_id =? AND quiz.usuario_id =?`,
+         WHERE pergunta.quiz_id =? AND quiz.usuario_id =? AND quiz.nota IS NULL`,
         [quizId, usuarioId]
     )
     return resultado.map((pergunta)=> ({
@@ -73,10 +73,15 @@ export async function atualizarRespostas(quiz: AtualizarPergunta, usuarioId:numb
 
    try{
       await conn.beginTransaction()
-      await conn.query(
-        `UPDATE quiz SET  nota = ? WHERE id = ? AND usuario_id = ?`,
+      const [quizAtualizado] = await conn.query<ResultSetHeader>(
+        `UPDATE quiz SET  nota = ? WHERE id = ? AND usuario_id = ? AND nota IS NULL`,
         [notaCalculada, quiz.id, usuarioId ]
       )
+      // outra requisição já respondeu esse quiz
+      if(quizAtualizado.affectedRows === 0){
+        await conn.rollback()
+        return false
+      }
 
       for (const pergunta of quiz.perguntas){
        await conn.query(
@@ -85,6 +90,7 @@ export async function atualizarRespostas(quiz: AtualizarPergunta, usuarioId:numb
         )
       }
       await conn.commit()
+      return true
 
    }catch(err: unknown){
           console.error('Falha ao atualizar respostas, fazendo rollback:', err)
