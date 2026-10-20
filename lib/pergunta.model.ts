@@ -2,52 +2,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { getPool } from "./db";
 import { QuizData, Pergunta, DadosQuiz, PerguntaBanco, PerguntaQuiz, AtualizarPergunta } from "@/types";
 
-export async function SalvarQuiz(quizData: QuizData, perguntas: Pergunta[]) {
-  const conn = await getPool().getConnection();
-  const dados = []
-  try{
-    await conn.beginTransaction()
 
-
-  const [quiz] = await conn.query<ResultSetHeader>(
-    "INSERT INTO quiz (usuario_id, dificuldade,  total_perguntas, data) VALUES (?,?,?,CURDATE())",
-    [quizData.usuarioId, quizData.dificuldade, perguntas.length],
-  );
-
-const dadosQuiz : DadosQuiz= {
-    quizId: quiz.insertId,
-    todasPerguntas: []
-  }
-      for (const pergunta of perguntas) {
-    const [perguntaUnica] = await conn.query<ResultSetHeader>(
-    "INSERT INTO pergunta (enunciado, categoria, opcoes, resposta_certa, quiz_id) VALUES (?,?,?,?, ?)",
-      [pergunta.enunciado,
-      pergunta.categoria,
-      JSON.stringify(pergunta.opcoes),
-      pergunta.respostaCerta,
-      quiz.insertId,]
-    );
-
-    dadosQuiz.todasPerguntas.push({
-      id: perguntaUnica.insertId,
-      enunciado: pergunta.enunciado,
-      opcoes: pergunta.opcoes,
-    })
-  }
-  dados.push(dadosQuiz)
-
-  await conn.commit()
-  return dados[0]
-  }catch(err: unknown){
-    console.error('Falha ao salvar quiz, fazendo rollback:', err)
-    await conn.rollback()
-    throw err
-  }finally{
-    conn.release()
-
-
-  }
-}
 
 export async function buscarQuiz(quizId:number, usuarioId: number): Promise<PerguntaQuiz[]>{
     const [resultado]= await getPool().query<PerguntaBanco[]>(
@@ -68,40 +23,6 @@ export async function buscarQuiz(quizId:number, usuarioId: number): Promise<Perg
     }))
 }
 
-export async function atualizarRespostas(quiz: AtualizarPergunta, usuarioId:number, notaCalculada:number){
-   const conn = await getPool().getConnection();
-
-   try{
-      await conn.beginTransaction()
-      const [quizAtualizado] = await conn.query<ResultSetHeader>(
-        `UPDATE quiz SET  nota = ? WHERE id = ? AND usuario_id = ? AND nota IS NULL`,
-        [notaCalculada, quiz.id, usuarioId ]
-      )
-      // outra requisição já respondeu esse quiz
-      if(quizAtualizado.affectedRows === 0){
-        await conn.rollback()
-        return false
-      }
-
-      for (const pergunta of quiz.perguntas){
-       await conn.query(
-          `UPDATE pergunta SET resposta_usuario = ?, acertou = ? WHERE id=?`,
-          [pergunta.respostaUsuario, pergunta.acertou, pergunta.id]
-        )
-      }
-      await conn.commit()
-      return true
-
-   }catch(err: unknown){
-          console.error('Falha ao atualizar respostas, fazendo rollback:', err)
-          await conn.rollback()
-          throw err
-   }finally{
-    conn.release()
-  }
-
-
-}
 
 export async function buscarPergunta(perguntaId:number, usuarioId:number): Promise<PerguntaQuiz | null>{
       const [resultado] = await getPool().query<PerguntaBanco[]>(

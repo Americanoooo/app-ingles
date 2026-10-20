@@ -4,3 +4,10 @@ export class EmailJaCadastradoError extends Error {
         this.name = "EmailJaCadastradoError"
     }
 }
+
+export class QuizNaoEncontradoError extends Error{
+      constructor( message: string){
+        super(message);
+        this.name = "QuizNaoEncontradoError"
+    }
+}

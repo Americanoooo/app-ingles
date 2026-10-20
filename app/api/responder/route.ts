@@ -1,7 +1,10 @@
 import { pegarUsuarioId } from "@/lib/auth";
-import { atualizarRespostas, buscarQuiz } from "@/lib/pergunta.model";
+import {QuizNaoEncontradoError} from "@/lib/erros"
+import {  buscarQuiz } from "@/lib/pergunta.model";
 import { badRequest, calcularNota, internalServerError, NotFound } from "@/lib/respostas";
 import { z } from "zod";
+import {atualizarQuiz } from "@/lib/models/quiz.model";
+
 
 
 const responderSchema = z.object({
@@ -68,14 +71,14 @@ export async function POST(req: Request){
     const acertos =  perguntasCompletas.filter((p)=> p.acertou).length
     const notaCalculada = calcularNota(acertos, quizBanco.length)
 
-    const atualizou = await atualizarRespostas({id: quizId, perguntas: perguntasCompletas}, usuarioId, notaCalculada)
-    if(!atualizou){
-        return NotFound()
-    }
+    await atualizarQuiz({id: quizId, perguntas: perguntasCompletas}, usuarioId, notaCalculada)
+   
     return Response.json({perguntasCompletas, notaCalculada, acertos}, {status:200})
     }catch(err:unknown){
-        const error = err instanceof Error ? err.message : 'Erro ao salvar quiz'
-        console.error(error)
+    if(err instanceof QuizNaoEncontradoError){
+       return NotFound()
+    }        
+        console.error(err)
         return internalServerError()
     }
 

@@ -1,5 +1,8 @@
-import { QuizData, Pergunta, DadosQuiz, PerguntaBanco, PerguntaQuiz, AtualizarPergunta } from "@/types";
+import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta } from "@/types";
 import { prisma } from "@/lib/prisma";
+import { QuizNaoEncontradoError } from "@/lib/erros";
+
+
 
 export async function criarQuiz(quizData: QuizData, perguntas: Pergunta[]): Promise <DadosQuiz> { 
     const perguntasParaSalvar = perguntas.map((p)=> ({
@@ -9,9 +12,6 @@ export async function criarQuiz(quizData: QuizData, perguntas: Pergunta[]): Prom
         resposta_certa: p.respostaCerta
     }))
 
-    // @db.Date grava a parte de data em UTC. Com new Date() puro, um quiz feito depois das 21h
-    // no Brasil ficaria com a data de amanhã. Calculando o dia em São Paulo, a data fica certa
-    // independente do fuso do servidor.
     const hoje = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date())
 
     const quiz = await prisma.quiz.create({
@@ -37,4 +37,37 @@ export async function criarQuiz(quizData: QuizData, perguntas: Pergunta[]): Prom
 
             }))
         }
+}
+
+export async function atualizarQuiz(quiz: AtualizarPergunta, usuarioId:number, notaCalculada:number): Promise <void>{
+        return prisma.$transaction(async (tx)=> {
+            const { count } = await tx.quiz.updateMany({
+                where: {
+                    id: quiz.id,
+                    usuario_id: usuarioId,
+                    nota: null
+                },
+                data: {
+                    nota: notaCalculada
+                }
+            })
+
+            if(count === 0){
+                throw new QuizNaoEncontradoError("Não foi possível atualizar o quiz")
+            }
+
+            for(const pergunta of quiz.perguntas){
+                await tx.pergunta.update({
+                    where: {
+                        id: pergunta.id,
+                        quiz_id: quiz.id
+                    },
+                    data: {
+                        resposta_usuario: pergunta.respostaUsuario,
+                        acertou: pergunta.acertou,
+
+                    }
+                })
+            }
+        })
 }
