@@ -1,4 +1,4 @@
-import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta } from "@/types";
+import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta, PerguntaQuiz } from "@/types";
 import { prisma } from "@/lib/prisma";
 import { QuizNaoEncontradoError } from "@/lib/erros";
 
@@ -70,4 +70,27 @@ export async function atualizarQuiz(quiz: AtualizarPergunta, usuarioId:number, n
                 })
             }
         })
+}
+
+export async function buscarQuiz(quizId:number, usuarioId: number): Promise<PerguntaQuiz[]>{
+    const perguntas = await prisma.pergunta.findMany({
+        where: {
+            quiz_id: quizId,
+            quiz: {
+                usuario_id: usuarioId,
+                nota: null
+            }
+
+        }
+    })
+        return perguntas.map((pergunta)=> ({
+        id: pergunta.id,
+        enunciado: pergunta.enunciado,
+        categoria: pergunta.categoria,
+        opcoes: JSON.parse(pergunta.opcoes),
+        respostaCerta: pergunta.resposta_certa,
+        respostaUsuario: pergunta.resposta_usuario,
+        acertou: Boolean(pergunta.acertou),
+        quizId: pergunta.quiz_id,
+    }))
 }

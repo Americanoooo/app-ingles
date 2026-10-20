@@ -58,7 +58,7 @@ export interface PerguntaQuiz {
   categoria: "preposicao" | "tempo_verbal" | "contexto",
   opcoes: string[],
   respostaCerta: string,
-  respostaUsuario: string,
+  respostaUsuario: string | null,
   acertou: boolean,
   quizId: number,
 }

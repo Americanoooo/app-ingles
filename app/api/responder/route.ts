@@ -1,9 +1,8 @@
 import { pegarUsuarioId } from "@/lib/auth";
 import {QuizNaoEncontradoError} from "@/lib/erros"
-import {  buscarQuiz } from "@/lib/pergunta.model";
 import { badRequest, calcularNota, internalServerError, NotFound } from "@/lib/respostas";
 import { z } from "zod";
-import {atualizarQuiz } from "@/lib/models/quiz.model";
+import {atualizarQuiz, buscarQuiz} from "@/lib/models/quiz.model";
 
 
 

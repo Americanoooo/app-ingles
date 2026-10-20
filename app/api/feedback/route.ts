@@ -1,7 +1,7 @@
 import * as z from "zod"; 
 import { badRequest, IAResponseError, internalServerError,NotFound } from "@/lib/respostas";
 import { pegarUsuarioId } from "@/lib/auth";
-import { buscarPergunta } from "@/lib/pergunta.model";
+import { buscarPergunta } from "@/lib/models/pergunta.model";
 
 const RespostaIA = z.object({
     explicacao: z.string()
