@@ -1,5 +1,5 @@
 import { pegarUsuarioId } from "@/lib/auth";
-import { SalvarQuiz } from "@/lib/pergunta.model";
+import { criarQuiz } from "@/lib/models/quiz.model";
 import { badRequest, IAResponseError, internalServerError } from "@/lib/respostas";
 import * as z from "zod"; 
 
@@ -124,11 +124,10 @@ export async function POST(req: Request) {
             dificuldade: input.data.dificuldade
 
           }
-          const registrarQuiz = await SalvarQuiz(quizData, quiz.data)
+          const registrarQuiz = await criarQuiz(quizData, quiz.data)
           quizGravado = {
             quizId: registrarQuiz.quizId,
             todasPerguntas: registrarQuiz.todasPerguntas
-
           }
         }catch(err: unknown){
           console.error(err)

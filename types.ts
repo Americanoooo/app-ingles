@@ -36,7 +36,7 @@ export interface Pergunta {
   enunciado: string,
   categoria: "preposicao" | "tempo_verbal" | "contexto",
   opcoes: string[],
-  respostaCerta?: string,
+  respostaCerta: string,
   respostaUsuario?: string,
   acertou?: boolean,
 }
