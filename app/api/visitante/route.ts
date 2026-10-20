@@ -1,4 +1,4 @@
-import { login } from "@/lib/login.model";
+import { buscarPorEmail } from "@/lib/models/usuario.model";
 import { IncorrectLogin, internalServerError } from "@/lib/respostas";
 import { createSession } from "@/lib/session";
 
@@ -10,7 +10,7 @@ export async function POST(){
     try{
         const email = "visitante@visitante.com"
 
-        const usuario = await login(email)
+        const usuario = await buscarPorEmail(email)
         if(!usuario){
             console.error("Conta não encontrada no banco")
             return internalServerError()

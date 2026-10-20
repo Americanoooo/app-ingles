@@ -1,4 +1,4 @@
-import { login } from '@/lib/login.model'
+import { buscarPorEmail } from '@/lib/models/usuario.model'
 import bcrypt from 'bcrypt'
 import { badRequest, IncorrectLogin, internalServerError, TooManyRequests } from '@/lib/respostas'
 import { createSession } from '@/lib/session'
@@ -29,7 +29,7 @@ export async function POST(req: Request){
         }
 
         
-        const usuario = await login(bodyValidado.data.email)
+        const usuario = await buscarPorEmail(bodyValidado.data.email)
         if(!usuario){
             return IncorrectLogin()
         }
