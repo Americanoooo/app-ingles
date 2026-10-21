@@ -1,4 +1,4 @@
-import { prisma } from "../prisma";
+import { getPrisma } from "../prisma";
 import type { pergunta } from "../generated/prisma/client";
 import { PerguntaQuiz } from "@/types";
 
@@ -16,7 +16,7 @@ export function paraPerguntaQuiz(pergunta: pergunta): PerguntaQuiz {
 }
 
 export async function buscarPergunta(perguntaId: number, usuarioId: number) {
-  const pergunta = await prisma.pergunta.findUnique({
+  const pergunta = await getPrisma().pergunta.findUnique({
     where: {
       id: perguntaId,
       quiz: {

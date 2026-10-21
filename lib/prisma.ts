@@ -24,6 +24,9 @@ function criarPrisma(){
 // cada reload criaria um PrismaClient novo (e um pool de conexões novo) até estourar o MySQL.
 const globalParaPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
-export const prisma = globalParaPrisma.prisma ?? criarPrisma()
-
-if(process.env.NODE_ENV !== "production") globalParaPrisma.prisma = prisma
+// Cria o client na primeira chamada, e não na importação: o next build importa as rotas
+// sem ter as variáveis do banco, e o guard do criarPrisma quebraria o build.
+export function getPrisma(){
+    if(!globalParaPrisma.prisma) globalParaPrisma.prisma = criarPrisma()
+    return globalParaPrisma.prisma
+}

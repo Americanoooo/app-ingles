@@ -1,5 +1,5 @@
 import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta, PerguntaQuiz, Quiz } from "@/types";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import { QuizNaoEncontradoError } from "@/lib/erros";
 import { paraPerguntaQuiz } from "@/lib/models/pergunta.model";
 import { hojeEmSaoPaulo } from "@/lib/datas";
@@ -14,7 +14,7 @@ export async function criarQuiz(quizData: QuizData, perguntas: Pergunta[]): Prom
         resposta_certa: p.respostaCerta
     }))
 
-    const quiz = await prisma.quiz.create({
+    const quiz = await getPrisma().quiz.create({
         data: {
             usuario_id:quizData.usuarioId,
             pergunta: { create: perguntasParaSalvar},
@@ -40,7 +40,7 @@ export async function criarQuiz(quizData: QuizData, perguntas: Pergunta[]): Prom
 }
 
 export async function atualizarQuiz(quiz: AtualizarPergunta, usuarioId:number, notaCalculada:number): Promise <void>{
-        return prisma.$transaction(async (tx)=> {
+        return getPrisma().$transaction(async (tx)=> {
             const { count } = await tx.quiz.updateMany({
                 where: {
                     id: quiz.id,
@@ -73,7 +73,7 @@ export async function atualizarQuiz(quiz: AtualizarPergunta, usuarioId:number, n
 }
 
 export async function buscarQuiz(quizId:number, usuarioId: number): Promise<PerguntaQuiz[]>{
-    const perguntas = await prisma.pergunta.findMany({
+    const perguntas = await getPrisma().pergunta.findMany({
         where: {
             quiz_id: quizId,
             quiz: {
@@ -87,7 +87,7 @@ export async function buscarQuiz(quizId:number, usuarioId: number): Promise<Perg
 }
 
 export async function buscarQuizFinalizado(quizId:number, usuarioId: number): Promise<PerguntaQuiz[]>{
-    const perguntas = await prisma.pergunta.findMany({
+    const perguntas = await getPrisma().pergunta.findMany({
         where: {
             quiz_id: quizId,
             quiz: {
@@ -100,7 +100,7 @@ export async function buscarQuizFinalizado(quizId:number, usuarioId: number): Pr
 }
 
 export async function listarQuizzesFinalizados(usuarioId: number): Promise<Quiz[]>{
-    const quizzes = await prisma.quiz.findMany({
+    const quizzes = await getPrisma().quiz.findMany({
         where: {
             usuario_id: usuarioId,
             nota: { not: null }

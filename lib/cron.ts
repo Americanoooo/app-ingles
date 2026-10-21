@@ -1,10 +1,10 @@
-import { prisma } from "./prisma";
+import { getPrisma } from "./prisma";
 import { ontemEmSaoPaulo } from "./datas";
 
 // Só apaga quizzes de antes de ontem: a coluna data não tem hora, então um quiz
 // começado às 23h ainda pode estar em andamento quando o cron roda à 01h.
 export async function apagarPerguntasAbandonadas(){
-    return prisma.pergunta.deleteMany({
+    return getPrisma().pergunta.deleteMany({
         where: {
             quiz: {
                 nota: null,
@@ -15,7 +15,7 @@ export async function apagarPerguntasAbandonadas(){
 }
 
 export async function apagarQuizzesAbandonados(){
-    return prisma.quiz.deleteMany({
+    return getPrisma().quiz.deleteMany({
         where: {
             nota: null,
             data: { lt: ontemEmSaoPaulo() }
@@ -25,6 +25,7 @@ export async function apagarQuizzesAbandonados(){
 
 export async function apagarHistoricoVisitante(){
     const email = "visitante@visitante.com"
+    const prisma = getPrisma()
     // perguntas antes dos quizzes por causa da foreign key pergunta.quiz_id
     const [perguntas, quizzes] = await prisma.$transaction([
         prisma.pergunta.deleteMany({ where: { quiz: { usuario: { email } } } }),

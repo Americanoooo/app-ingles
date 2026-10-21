@@ -1,9 +1,9 @@
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 import { Prisma } from "@/lib/generated/prisma/client";
 import { EmailJaCadastradoError } from "@/lib/erros";
 
 export async function buscarPorEmail(email: string){
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await getPrisma().usuario.findUnique({
         where: { email }
     })
     if(!usuario) return usuario
@@ -18,7 +18,7 @@ export async function buscarPorEmail(email: string){
 
 export async function cadastrarUsuario( email: string,nome:string, senhaHash:string){
     try{
-     await prisma.usuario.create({data: 
+     await getPrisma().usuario.create({data: 
         {
             nome: nome,
             email: email,
