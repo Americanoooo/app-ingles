@@ -12,7 +12,7 @@ export async function GET (req: Request){
         const quizzes = await apagarQuizzesAbandonados()
         const visitante = await apagarHistoricoVisitante()
 
-        return Response.json({mensagem: `total de quizzes deletados ${quizzes.affectedRows}, total de perguntas ${perguntas.affectedRows}, visitante: ${visitante.quizzes} quizzes e ${visitante.perguntas} perguntas`}, {status:200})
+        return Response.json({mensagem: `total de quizzes deletados ${quizzes.count}, total de perguntas ${perguntas.count}, visitante: ${visitante.quizzes} quizzes e ${visitante.perguntas} perguntas`}, {status:200})
     }catch(err){
         console.error(err)
         return internalServerError()

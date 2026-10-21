@@ -1,47 +1,34 @@
-import { ResultSetHeader } from "mysql2";
-import { getPool } from "./db";
+import { prisma } from "./prisma";
+import { ontemEmSaoPaulo } from "./datas";
 
+// Só apaga quizzes de antes de ontem: a coluna data não tem hora, então um quiz
+// começado às 23h ainda pode estar em andamento quando o cron roda à 01h.
 export async function apagarPerguntasAbandonadas(){
-    const [resultado] = await getPool().query<ResultSetHeader>(
-        `DELETE FROM pergunta 
-WHERE quiz_id IN (SELECT id FROM quiz WHERE nota IS NULL AND data < CURDATE() );`
-    )
-    return resultado
+    return prisma.pergunta.deleteMany({
+        where: {
+            quiz: {
+                nota: null,
+                data: { lt: ontemEmSaoPaulo() }
+            }
+        }
+    })
 }
 
 export async function apagarQuizzesAbandonados(){
-    const [resultado] = await getPool().query<ResultSetHeader>(
-        `DELETE FROM quiz WHERE nota IS NULL AND data < CURDATE()`
-    )
-    return resultado
+    return prisma.quiz.deleteMany({
+        where: {
+            nota: null,
+            data: { lt: ontemEmSaoPaulo() }
+        }
+    })
 }
 
 export async function apagarHistoricoVisitante(){
     const email = "visitante@visitante.com"
-    const conexao = await getPool().getConnection()
-    try{
-        await conexao.beginTransaction()
-        // perguntas antes dos quizzes por causa da foreign key pergunta.quiz_id
-        const [perguntas] = await conexao.query<ResultSetHeader>(
-            `DELETE p FROM pergunta p
-             JOIN quiz q ON q.id = p.quiz_id
-             JOIN usuario u ON u.id = q.usuario_id
-             WHERE u.email = ?`,
-            [email]
-        )
-        const [quizzes] = await conexao.query<ResultSetHeader>(
-            `DELETE q FROM quiz q
-             JOIN usuario u ON u.id = q.usuario_id
-             WHERE u.email = ?`,
-            [email]
-        )
-        await conexao.commit()
-        return {perguntas: perguntas.affectedRows, quizzes: quizzes.affectedRows}
-    }catch(err){
-        console.error('Falha ao apagar histórico do visitante, fazendo rollback:', err)
-        await conexao.rollback()
-        throw err
-    }finally{
-        conexao.release()
-    }
+    // perguntas antes dos quizzes por causa da foreign key pergunta.quiz_id
+    const [perguntas, quizzes] = await prisma.$transaction([
+        prisma.pergunta.deleteMany({ where: { quiz: { usuario: { email } } } }),
+        prisma.quiz.deleteMany({ where: { usuario: { email } } }),
+    ])
+    return {perguntas: perguntas.count, quizzes: quizzes.count}
 }
