@@ -55,7 +55,7 @@ Você tem permissão para rodar comandos e editar arquivos, mas o padrão é **n
 
 Clarify English (antes "App Inglês"): treinador de inglês full stack com quiz e feedback gerados por IA, no ar (Vercel + MySQL na Aiven). O que segue é um resumo e pode estar desatualizado: **o código é a fonte da verdade. Na primeira vez em cada conversa, leia `package.json`, a estrutura de pastas e os arquivos envolvidos antes de afirmar qualquer coisa sobre o projeto.**
 
-- **Stack:** Next.js 16 (App Router), React 19, TypeScript, MySQL via `mysql2`, Zod, `jose`, `bcrypt`, Upstash Redis, Gemini, Tailwind + shadcn.
+- **Stack:** Next.js 16 (App Router), React 19, TypeScript, MySQL via Prisma 7 (adapter MariaDB), Zod, `jose`, `bcrypt`, Upstash Redis, Gemini, Tailwind + shadcn.
 - **Estrutura:** grupos de rota `app/(app)` e `app/(auth)`; route handlers em `app/api/`; camada de dados em `lib/*.model.ts`; utilitários em `lib/` (`db.ts`, `redis.ts`, `auth.ts`, `session.ts`, `respostas.ts`, `rateLimite.ts`); `schema.sql` na raiz.
 - **Decisões já tomadas (ele sabe defender cada uma):**
   - Banco em snake_case, conversão para camelCase dentro dos models, logo após a query. Rotas e front nunca veem snake_case.

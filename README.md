@@ -47,7 +47,7 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 ## 🛠️ Tecnologias
 
 **Front-end:** Next.js 16 (App Router) · React · TypeScript · Tailwind CSS + shadcn/ui
-**Back-end:** Next.js Route Handlers + Proxy (antigo middleware) · MySQL (`mysql2`) · Zod · bcrypt · jose (JWT em cookie httpOnly)
+**Back-end:** Next.js Route Handlers + Proxy (antigo middleware) · MySQL + Prisma 7 (adapter MariaDB) · Zod · bcrypt · jose (JWT em cookie httpOnly)
 **IA:** Google Gemini (endpoint compatível com OpenAI), saída estruturada via `json_schema`
 **Infraestrutura:** Docker + Docker Compose · Upstash Redis (rate limiting) · Vercel Cron · Deploy: Vercel (app) + Aiven (MySQL)
 
