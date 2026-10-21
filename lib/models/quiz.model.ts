@@ -2,6 +2,7 @@ import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta, PerguntaQuiz, Quiz } 
 import { prisma } from "@/lib/prisma";
 import { QuizNaoEncontradoError } from "@/lib/erros";
 import { paraPerguntaQuiz } from "@/lib/models/pergunta.model";
+import { hojeEmSaoPaulo } from "@/lib/datas";
 
 
 
@@ -13,15 +14,13 @@ export async function criarQuiz(quizData: QuizData, perguntas: Pergunta[]): Prom
         resposta_certa: p.respostaCerta
     }))
 
-    const hoje = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date())
-
     const quiz = await prisma.quiz.create({
         data: {
             usuario_id:quizData.usuarioId,
             pergunta: { create: perguntasParaSalvar},
             dificuldade: quizData.dificuldade,
             total_perguntas: perguntasParaSalvar.length,
-            data: new Date(hoje)
+            data: hojeEmSaoPaulo()
 
             
         },
