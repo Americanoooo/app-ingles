@@ -1,4 +1,4 @@
-import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta, PerguntaQuiz } from "@/types";
+import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta, PerguntaQuiz, Quiz } from "@/types";
 import { prisma } from "@/lib/prisma";
 import { QuizNaoEncontradoError } from "@/lib/erros";
 import { paraPerguntaQuiz } from "@/lib/models/pergunta.model";
@@ -85,4 +85,22 @@ export async function buscarQuiz(quizId:number, usuarioId: number): Promise<Perg
         }
     })
         return perguntas.map(paraPerguntaQuiz)
+}
+
+export async function listarQuizzesFinalizados(usuarioId: number): Promise<Quiz[]>{
+    const quizzes = await prisma.quiz.findMany({
+        where: {
+            usuario_id: usuarioId,
+            nota: { not: null }
+        },
+        orderBy: [{ data: "desc" }, { id: "desc" }]
+    })
+    return quizzes.map((quiz)=> ({
+        id: quiz.id,
+        usuarioId: quiz.usuario_id,
+        dificuldade: quiz.dificuldade,
+        nota: Number(quiz.nota),
+        data: quiz.data.toISOString(),
+        totalPerguntas: quiz.total_perguntas ?? 0,
+    }))
 }
