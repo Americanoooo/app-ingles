@@ -70,15 +70,15 @@ A correção mudou o fluxo: `/api/gerar-perguntas` passou a persistir quiz e per
 **A rotina de limpeza.** É uma rota (`/api/limpeza`) invocada por um Vercel Cron uma vez por dia. Faz duas coisas: apaga quizzes abandonados de todos os usuários e zera o histórico da conta de visitante. Quatro decisões que valem explicação:
 
 - **Autenticação por segredo compartilhado, não por sessão.** O cron é um robô e não tem cookie, então a rota compara o header `Authorization` com a variável `CRON_SECRET` — e por isso ela também fica de fora do matcher do proxy, que exige sessão. São dois mecanismos de identidade para dois tipos de cliente. Se `CRON_SECRET` não estiver definida, a rota recusa tudo em vez de aceitar um header vazio.
-- **Abandonados sem transação, de propósito.** A ordem importa (perguntas antes de quiz, por causa da FK), mas uma falha no meio deixa apenas quizzes sem perguntas, que continuam batendo no critério de abandonado e somem na execução seguinte. Falha parcial que se autocorrige não precisa de transação; o `SalvarQuiz`, onde o estado intermediário seria visível para o usuário, precisa.
+- **Abandonados sem transação, de propósito.** A ordem importa (perguntas antes de quiz, por causa da FK), mas uma falha no meio deixa apenas quizzes sem perguntas, que continuam batendo no critério de abandonado e somem na execução seguinte. Falha parcial que se autocorrige não precisa de transação; o `criarQuiz`, onde o estado intermediário seria visível para o usuário, precisa.
 - **Visitante com transação.** Já a limpeza do visitante apaga quizzes **respondidos**, que não batem em critério nenhum na execução seguinte: se falhasse entre as perguntas e os quizzes, sobrariam quizzes sem perguntas aparecendo no relatório. Aqui o estado intermediário é visível, então as duas exclusões rodam numa transação.
-- **Margem de um dia no critério.** A limpeza só considera abandonado o que é anterior ao dia corrente, para nunca apagar um quiz que alguém está respondendo naquele momento.
+- **Margem no critério, e um bug que ela escondia.** A coluna `data` guarda só o dia, sem hora, então "abandonado" precisa ser definido em dias. A primeira versão apagava tudo que fosse anterior ao dia corrente, achando que isso protegia quem estava respondendo — mas um quiz começado às 23h já é "de ontem" quando o cron roda à 01h, e seria apagado no meio da resposta. Hoje o corte é anterior a ontem: todo quiz sobrevive pelo menos 25h antes de ser considerado abandonado. O "hoje" é calculado no código, no fuso de São Paulo, e não com o `CURDATE()` do MySQL, para a regra não depender do fuso configurado no servidor do banco.
 
 **Saída estruturada da IA (`json_schema`).** Resposta de LLM em texto livre é inconsistente na prática — e isso não é só estética: um parse que falha vira bug real na experiência do usuário (quiz não carrega, feedback trava). Por isso a geração das perguntas e o feedback por pergunta usam saída estruturada (`json_schema`, na chamada compatível com OpenAI ao Gemini) — o schema trava os campos que a IA precisa devolver, então o código lê cada um com confiança em vez de tentar adivinhar texto solto. Como camada extra, a resposta ainda passa por validação com Zod antes de qualquer gravação no banco — defesa em profundidade: o schema garante o formato na saída do LLM, o Zod garante que o que chega no back-end bate com o que o banco espera, mesmo que o provedor mude de comportamento.
 
-**Persistência atômica.** Quiz e perguntas precisam ser gravados como uma unidade: se a inserção de uma pergunta falhar no meio do caminho, sobra um quiz órfão no banco. Por isso `SalvarQuiz` e `atualizarRespostas` abrem uma transação (`beginTransaction` → queries → `commit`, com `rollback` no catch e `release` da conexão no `finally`). Todas as queries da transação rodam na **mesma conexão** obtida do pool — se cada uma pegasse uma conexão qualquer, o rollback de uma não teria efeito nenhum sobre o que já rodou em outra.
+**Persistência atômica.** Quiz e perguntas precisam ser gravados como uma unidade: se a inserção de uma pergunta falhar no meio do caminho, sobra um quiz órfão no banco. No `criarQuiz`, quiz e perguntas vão num único `create` com escrita aninhada, que o Prisma executa de forma atômica. No `atualizarQuiz`, a transação é interativa (`prisma.$transaction(async (tx) => …)`) porque precisa decidir no meio do caminho: se o UPDATE do quiz não encontrou nada (já respondido ou de outro usuário), lança erro e desfaz tudo. A regra que mais importa ali é usar sempre o `tx` dentro do callback, nunca o `prisma` — uma query feita pelo `prisma` roda em outra conexão, fora da transação, e o rollback não teria efeito nenhum sobre ela. Quando as operações são uma sequência fixa, sem decisão no meio (como a limpeza do visitante), uso a forma em array, `prisma.$transaction([...])`.
 
-**Uma convenção de nomes, convertida num lugar só.** O banco usa snake_case e o restante da aplicação usa camelCase. A conversão acontece dentro dos models (`lib/*.model.ts`), logo depois da query: rotas e front nunca veem nome de coluna. Antes disso, uma rota devolvia a linha crua do banco enquanto outras já convertiam, e o mesmo dado chegava com dois formatos diferentes dependendo da tela — origem de vários bugs silenciosos, porque o TypeScript não acusa quando a interface descreve um formato que o dado real não tem.
+**Uma convenção de nomes, convertida num lugar só.** O banco usa snake_case e o restante da aplicação usa camelCase. A conversão acontece dentro dos models (`lib/models/*.model.ts`), logo depois da query — no caso das perguntas, numa função só (`paraPerguntaQuiz`) usada por todas as buscas: rotas e front nunca veem nome de coluna. Antes disso, uma rota devolvia a linha crua do banco enquanto outras já convertiam, e o mesmo dado chegava com dois formatos diferentes dependendo da tela — origem de vários bugs silenciosos, porque o TypeScript não acusa quando a interface descreve um formato que o dado real não tem.
 
 **Erro tratado por camada.** O model lança, a rota traduz para HTTP e o front exibe. As funções em `lib/respostas.ts` concentram os status e as mensagens voltadas ao usuário; o detalhe técnico vai só para o log. No cliente, o `apiFetch` converte qualquer resposta com status de erro em um `ApiError` que carrega status e mensagem, e a tela usa `instanceof` para distinguir "o servidor respondeu com erro" de "a requisição nem chegou lá" — só no primeiro caso a mensagem do backend é exibida. No proxy (`proxy.ts`, o antigo middleware do Next.js), a mesma ideia separa o que é falha de autenticação (bloqueia) do que é falha de infraestrutura do rate limit (registra no log e deixa passar).
 
@@ -105,6 +105,7 @@ Acesse http://localhost:3001 — o schema do banco (incluindo a conta de visitan
 
 ```bash
 npm install
+npx prisma generate   # gera o client do Prisma em lib/generated (fica fora do git)
 # configure o .env apontando pro seu MySQL local
 npm run dev
 ```
@@ -142,7 +143,12 @@ app/
 ├── opengraph-image.tsx  # imagem de compartilhamento gerada no build
 components/
 ├── ui/               # shadcn/ui
-lib/                  # models, conexão com o banco, helpers
+lib/
+├── models/           # acesso ao banco via Prisma + conversão snake_case → camelCase
+├── prisma.ts         # client do Prisma (adapter MariaDB)
+└── …                 # sessão, respostas HTTP, datas, rate limit
+prisma/schema.prisma  # modelos do banco
+prisma.config.ts      # config da CLI do Prisma
 proxy.ts              # sessão + rate limit das rotas de API (antigo middleware)
 schema.sql            # estrutura do banco + conta de visitante
 vercel.json           # agendamento do cron de limpeza
@@ -155,7 +161,7 @@ dockerfile
 ## 🗺️ Roadmap
 
 - **Modo adaptativo** — gerar perguntas focadas nas categorias que o usuário mais erra, lendo o histórico de acertos.
-- **`data` como DATETIME** — hoje a coluna guarda só o dia, o que limita a ordenação do histórico e a granularidade da limpeza a intervalos de 24h.
+- **`data` como DATETIME** — hoje a coluna guarda só o dia, o que limita a ordenação do histórico e obriga a limpeza a esperar pelo menos 25h para considerar um quiz abandonado.
 
 ---
 
@@ -167,6 +173,6 @@ dockerfile
 
 ## English summary
 
-Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js 16 App Router, TypeScript, MySQL), with a public landing page and a guest mode for trying it without signing up. The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. The same flow also rejects answers that aren't among the question's options, blocks answering a quiz twice (the check lives in the `UPDATE` itself, so concurrent requests can't both win), and the feedback route receives only a question id and builds the prompt from the database, so the client can't drive the LLM. The accepted trade-off — rows that start incomplete, and abandoned quizzes that pile up — is handled by a daily Vercel Cron cleanup route, authenticated by a shared secret rather than by session, which also wipes the shared guest account's history. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Writes run inside a single DB transaction on one pooled connection. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
+Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js 16 App Router, TypeScript, MySQL via Prisma 7), with a public landing page and a guest mode for trying it without signing up. The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. The same flow also rejects answers that aren't among the question's options, blocks answering a quiz twice (the check lives in the `UPDATE` itself, so concurrent requests can't both win), and the feedback route receives only a question id and builds the prompt from the database, so the client can't drive the LLM. The accepted trade-off — rows that start incomplete, and abandoned quizzes that pile up — is handled by a daily Vercel Cron cleanup route, authenticated by a shared secret rather than by session, which also wipes the shared guest account's history. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Multi-step writes run inside Prisma transactions, so a failure halfway leaves nothing behind. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
 
 Demo: https://app-ingles-bay.vercel.app · Repo: github.com/Americanoooo/app-ingles
