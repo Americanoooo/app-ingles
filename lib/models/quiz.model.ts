@@ -1,6 +1,7 @@
 import { QuizData, Pergunta, DadosQuiz, AtualizarPergunta, PerguntaQuiz } from "@/types";
 import { prisma } from "@/lib/prisma";
 import { QuizNaoEncontradoError } from "@/lib/erros";
+import { paraPerguntaQuiz } from "@/lib/models/pergunta.model";
 
 
 
@@ -83,14 +84,5 @@ export async function buscarQuiz(quizId:number, usuarioId: number): Promise<Perg
 
         }
     })
-        return perguntas.map((pergunta)=> ({
-        id: pergunta.id,
-        enunciado: pergunta.enunciado,
-        categoria: pergunta.categoria,
-        opcoes: JSON.parse(pergunta.opcoes),
-        respostaCerta: pergunta.resposta_certa,
-        respostaUsuario: pergunta.resposta_usuario,
-        acertou: Boolean(pergunta.acertou),
-        quizId: pergunta.quiz_id,
-    }))
+        return perguntas.map(paraPerguntaQuiz)
 }
