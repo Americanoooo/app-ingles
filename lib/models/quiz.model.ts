@@ -87,6 +87,19 @@ export async function buscarQuiz(quizId:number, usuarioId: number): Promise<Perg
         return perguntas.map(paraPerguntaQuiz)
 }
 
+export async function buscarQuizFinalizado(quizId:number, usuarioId: number): Promise<PerguntaQuiz[]>{
+    const perguntas = await prisma.pergunta.findMany({
+        where: {
+            quiz_id: quizId,
+            quiz: {
+                usuario_id: usuarioId,
+                nota: { not: null }
+            }
+        }
+    })
+        return perguntas.map(paraPerguntaQuiz)
+}
+
 export async function listarQuizzesFinalizados(usuarioId: number): Promise<Quiz[]>{
     const quizzes = await prisma.quiz.findMany({
         where: {
