@@ -138,7 +138,7 @@ function Relatorio(){
                     <CardContent className="flex flex-col gap-4 p-4">
                         <div className="flex items-center justify-between gap-3">
                             <span className={`rounded-full px-2.5 py-1 text-sm font-bold ${corDificuldade(q.dificuldade)}`}>{converterDificuldade(q.dificuldade)}</span>
-                            <span className="text-xs font-medium text-muted-foreground">{new Date(q.data).toLocaleDateString('pt-BR')}</span>
+                            <span className="text-xs font-medium text-muted-foreground">{new Date(q.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
                         </div>
                         <div className="flex items-end justify-between gap-3">
                             <p className="flex items-baseline gap-2 font-heading font-bold"><span className="text-base text-muted-foreground">Nota</span><span className="text-5xl text-primary-strong tabular-nums">{q.nota}</span></p>
