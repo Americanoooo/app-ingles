@@ -74,9 +74,9 @@ function Relatorio(){
     }
 
     function corDificuldade(d: number){
-        if(d === 1) return "bg-success/15 text-success ring-1 ring-success/30"
-        if(d === 2) return "bg-warning/15 text-warning ring-1 ring-warning/30"
-        return "bg-destructive/15 text-destructive ring-1 ring-destructive/30"
+        if(d === 1) return "bg-success/15 text-success-strong ring-1 ring-success/30"
+        if(d === 2) return "bg-warning/15 text-warning-strong ring-1 ring-warning/30"
+        return "bg-destructive/15 text-destructive-strong ring-1 ring-destructive/30"
     }
 
 
@@ -138,10 +138,10 @@ function Relatorio(){
                     <CardContent className="flex flex-col gap-4 p-4">
                         <div className="flex items-center justify-between gap-3">
                             <span className={`rounded-full px-2.5 py-1 text-sm font-bold ${corDificuldade(q.dificuldade)}`}>{converterDificuldade(q.dificuldade)}</span>
-                            <span className="text-xs font-medium text-muted-foreground">{new Date(q.data).toLocaleDateString('pt-BR')}</span>
+                            <span className="text-xs font-medium text-muted-foreground">{new Date(q.data).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</span>
                         </div>
                         <div className="flex items-end justify-between gap-3">
-                            <p className="font-heading text-4xl font-bold text-primary">Nota: {q.nota}</p>
+                            <p className="flex items-baseline gap-2 font-heading font-bold"><span className="text-base text-muted-foreground">Nota</span><span className="text-5xl text-primary-strong tabular-nums">{q.nota}</span></p>
                             <p className="text-xs font-medium text-muted-foreground">{q.totalPerguntas} perguntas</p>
                         </div>
                     </CardContent>

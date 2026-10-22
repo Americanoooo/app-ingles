@@ -5,22 +5,37 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/apiFetch";
-import { Menu, X } from "lucide-react";
+import { Loader2, Menu, X } from "lucide-react";
+import { Logo } from "./Logo";
 
 export function Navbar(){
     const router = useRouter()
     const [menuAberto, setMenuAberto] = useState(false)
+    const [saindo, setSaindo] = useState(false)
 
     async function handleLogout(){
-      await apiFetch("/api/logout", {method:"POST"})
-      window.location.href = "/login";
+      setSaindo(true)
+      try{
+        await apiFetch("/api/logout", {method:"POST"})
+        // Sem resetar o estado no sucesso: o botão fica travado até a página trocar
+        window.location.href = "/login";
+      }catch(err){
+        console.error(err)
+        setSaindo(false)
+      }
     }
 
     return(
     <nav className="border-b border-border bg-card">
       <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4 sm:px-8">
-        <h1 className="font-heading text-lg font-bold text-foreground sm:text-xl">
-          App <span className="text-primary">Inglês</span>
+        <h1>
+          <Link
+            href="/treino"
+            aria-label="AI Fluency, voltar para o treino"
+            className="cursor-pointer rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <Logo />
+          </Link>
         </h1>
 
         <div className="hidden sm:flex gap-2 items-center">
@@ -38,11 +53,13 @@ export function Navbar(){
           </Link>
           <Button
             onClick={() => handleLogout()}
-            variant="outline"
+            variant="destructive"
             size="sm"
             className="ml-2 rounded-full"
+            disabled={saindo}
           >
-            Sair
+            {saindo && <Loader2 className="animate-spin" />}
+            {saindo ? "Saindo..." : "Sair"}
           </Button>
         </div>
 
@@ -75,10 +92,12 @@ export function Navbar(){
           </Link>
           <Button
             onClick={() => handleLogout()}
-            variant="outline"
+            variant="destructive"
             className="mt-2 h-11 w-full rounded-full"
+            disabled={saindo}
           >
-            Sair
+            {saindo && <Loader2 className="animate-spin" />}
+            {saindo ? "Saindo..." : "Sair"}
           </Button>
         </div>
       )}

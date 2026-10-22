@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
-import { Fredoka, Nunito } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const fredoka = Fredoka({
+const fredoka = localFont({
+  src: "./fonts/Fredoka-latin.woff2",
   variable: "--font-fredoka",
-  subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: "600 700",
 });
 
-const nunito = Nunito({
+const nunito = localFont({
+  src: "./fonts/Nunito-latin.woff2",
   variable: "--font-nunito",
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: "400 700",
 });
 
 export const metadata: Metadata = {
-  title: "App Inglês",
+  title: "AI Fluency",
   description: "Treine seu inglês com inteligência artificial.",
 
 };
