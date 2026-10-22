@@ -1,7 +1,9 @@
 import { pegarUsuarioId } from "@/lib/auth";
-import { atualizarRespostas, buscarQuiz } from "@/lib/pergunta.model";
+import {QuizNaoEncontradoError} from "@/lib/erros"
 import { badRequest, calcularNota, internalServerError, NotFound } from "@/lib/respostas";
 import { z } from "zod";
+import {atualizarQuiz, buscarQuiz} from "@/lib/models/quiz.model";
+
 
 
 const responderSchema = z.object({
@@ -30,6 +32,8 @@ export async function POST(req: Request){
          return badRequest()
         }
 
+        
+
     const {quizId, respostasQuiz} = parse.data
 
     const quizBanco  = await buscarQuiz(quizId, usuarioId)
@@ -45,10 +49,14 @@ export async function POST(req: Request){
         return badRequest()
     }
     const perguntasCompletas = quizBanco.map((pergunta)=> {
+        
        const resposta = respostasQuiz.find((p)=> p.perguntaId === pergunta.id)
        if(!resposta) {
         throw new Error('Pergunta sem resposta correspondente')
        }
+       if(!pergunta.opcoes.includes(resposta.respostaUsuario)){
+            throw new Error('Resposta do usuário inválida')
+        }
        return {
         ...pergunta,
         respostaUsuario: resposta.respostaUsuario,
@@ -62,11 +70,14 @@ export async function POST(req: Request){
     const acertos =  perguntasCompletas.filter((p)=> p.acertou).length
     const notaCalculada = calcularNota(acertos, quizBanco.length)
 
-         await atualizarRespostas({id: quizId, perguntas: perguntasCompletas}, usuarioId, notaCalculada)
+    await atualizarQuiz({id: quizId, perguntas: perguntasCompletas}, usuarioId, notaCalculada)
+   
     return Response.json({perguntasCompletas, notaCalculada, acertos}, {status:200})
     }catch(err:unknown){
-        const error = err instanceof Error ? err.message : 'Erro ao salvar quiz'
-        console.error(error)
+    if(err instanceof QuizNaoEncontradoError){
+       return NotFound()
+    }        
+        console.error(err)
         return internalServerError()
     }
 

@@ -7,19 +7,20 @@ services:
     ports:
       - "3307:3306" 
     volumes:
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
       - dados_mysql:/var/lib/mysql
     healthcheck:                                    
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
       interval: 5s
       timeout: 5s
       retries: 20
-      start_period: 60s
+      start_period: 180s
 
   app:
     build: .
+    command: npm run start:docker
+
     ports: 
-      - "3000:3000"
+      - "3001:3000"
     environment:
       DB_HOST: db
       DB_USER: root
@@ -28,8 +29,13 @@ services:
       DB_PORT: 3306
       JWT_SECRET: ${JWT_SECRET}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-    depends_on: 
-      - db
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
+      CRON_SECRET: ${CRON_SECRET}
+      DATABASE_URL: mysql://root:${DB_PASSWORD}@db:3306/app_ingles
+    depends_on:
+       db :
+        condition: service_healthy
 
 volumes:
   dados_mysql:

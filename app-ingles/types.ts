@@ -1,5 +1,3 @@
-import { RowDataPacket } from "mysql2";
-
 export interface QuizData {
   usuarioId: number,
   dificuldade: number,
@@ -36,21 +34,11 @@ export interface Pergunta {
   enunciado: string,
   categoria: "preposicao" | "tempo_verbal" | "contexto",
   opcoes: string[],
-  respostaCerta?: string,
+  respostaCerta: string,
   respostaUsuario?: string,
   acertou?: boolean,
 }
 
-
-export interface PerguntaBanco extends RowDataPacket{
-  id: number,
-  enunciado: string,
-  categoria: "preposicao" | "tempo_verbal" | "contexto",
-  opcoes: string,
-  resposta_certa: string,
-  resposta_usuario: string,
-  acertou: boolean,
-}
 
 export interface PerguntaQuiz {
   id: number,
@@ -58,7 +46,7 @@ export interface PerguntaQuiz {
   categoria: "preposicao" | "tempo_verbal" | "contexto",
   opcoes: string[],
   respostaCerta: string,
-  respostaUsuario: string,
+  respostaUsuario: string | null,
   acertou: boolean,
   quizId: number,
 }

@@ -1,15 +1,14 @@
 import * as z from "zod"; 
-import { badRequest, IAResponseError, internalServerError } from "@/lib/respostas";
+import { badRequest, IAResponseError, internalServerError,NotFound } from "@/lib/respostas";
+import { pegarUsuarioId } from "@/lib/auth";
+import { buscarPergunta } from "@/lib/models/pergunta.model";
 
 const RespostaIA = z.object({
     explicacao: z.string()
 })
 
 const Input = z.object({
-    enunciado: z.string(),
-    respostaUsuario: z.string(),
-    respostaCerta: z.string(),
-    categoria: z.enum(["preposicao", "tempo_verbal", "contexto"]),
+    perguntaId: z.number()
 })
 
 export async function POST(req: Request){
@@ -18,6 +17,11 @@ export async function POST(req: Request){
     const validacao = await Input.safeParseAsync(body)
     if(!validacao.success){
         return badRequest()
+    }
+    const usuarioId = await pegarUsuarioId()
+    const pergunta = await buscarPergunta(validacao.data.perguntaId, usuarioId)
+    if(!pergunta){
+        return NotFound()
     }
 
         const API_KEY = process.env.GEMINI_API_KEY;
@@ -39,10 +43,10 @@ export async function POST(req: Request){
                     },
                     {
                         role: 'user',
-                        content: `Um aluno respondeu uma questão de inglês sobre ${validacao.data.categoria}.
-                                    Pergunta: "${validacao.data.enunciado}"
-                                    Resposta correta: "${validacao.data.respostaCerta}"
-                                    Resposta do aluno: "${validacao.data.respostaUsuario}"
+                        content: `Um aluno respondeu uma questão de inglês sobre ${pergunta.categoria}.
+                                    Pergunta: "${pergunta.enunciado}"
+                                    Resposta correta: "${pergunta.respostaCerta}"
+                                    Resposta do aluno: "${pergunta.respostaUsuario}"
 
                                     Se o aluno acertou, confirme e explique por que está correto. Se errou, explique por que a resposta correta é a certa e por que a dele não serve. Responda em português, de forma simples e didática.`
                     },

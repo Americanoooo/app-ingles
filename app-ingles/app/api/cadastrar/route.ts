@@ -1,6 +1,7 @@
-import { cadastrarUsuario } from '@/lib/cadastrar.model'
+import { cadastrarUsuario } from '@/lib/models/usuario.model'
 import { rateLimite } from '@/lib/rateLimite';
 import {  internalServerError, TooManyRequests } from '@/lib/respostas';
+import {EmailJaCadastradoError} from "@/lib/erros"
 import bcrypt from 'bcrypt'
 import { z} from 'zod'
 
@@ -44,9 +45,10 @@ export async function POST(req: Request){
         await cadastrarUsuario(email,nome , senhaHash)
         return Response.json({mensagem: 'Usuário cadastrado com sucesso'}, {status: 201})
     }catch(err:unknown){        
-        if(err && typeof err === 'object' && 'code' in err && err.code === 'ER_DUP_ENTRY'){
+        if(err instanceof EmailJaCadastradoError){
             return Response.json({mensagem: 'Este email já está cadastrado'}, {status: 409})
         }
+        console.error(err)
         return internalServerError()
     }
 }

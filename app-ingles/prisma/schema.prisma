@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model pergunta {
+  id               Int                @id @default(autoincrement())
+  quiz_id          Int
+  enunciado        String             @db.VarChar(1000)
+  categoria        pergunta_categoria
+  opcoes           String             @db.VarChar(1000)
+  resposta_certa   String             @db.VarChar(1000)
+  resposta_usuario String?            @db.VarChar(1000)
+  acertou          Boolean?           @default(false)
+  quiz             quiz               @relation(fields: [quiz_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pergunta_ibfk_1")
+
+  @@index([quiz_id], map: "quiz_id")
+}
+
+model quiz {
+  id              Int        @id @default(autoincrement())
+  usuario_id      Int
+  dificuldade     Int
+  nota            Decimal?   @db.Decimal(4, 2)
+  data            DateTime   @db.Date
+  total_perguntas Int?
+  pergunta        pergunta[]
+  usuario         usuario    @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "quiz_ibfk_1")
+
+  @@index([usuario_id], map: "usuario_id")
+}
+
+model usuario {
+  id         Int    @id @default(autoincrement())
+  nome       String @db.VarChar(100)
+  email      String @unique(map: "email") @db.VarChar(255)
+  senha_hash String @db.VarChar(255)
+  quiz       quiz[]
+}
+
+enum pergunta_categoria {
+  preposicao
+  tempo_verbal
+  contexto
+}
