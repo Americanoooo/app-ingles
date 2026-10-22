@@ -38,7 +38,9 @@ model usuario {
   id         Int    @id @default(autoincrement())
   nome       String @db.VarChar(100)
   email      String @unique(map: "email") @db.VarChar(255)
-  senha_hash String @db.VarChar(255)
+  senha_hash String? @db.VarChar(255)
+  email_verificado Boolean @default(false)
+  google_sub String? @db.VarChar(255) @unique
   quiz       quiz[]
 }
 

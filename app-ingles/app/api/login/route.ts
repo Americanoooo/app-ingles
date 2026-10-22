@@ -34,6 +34,10 @@ export async function POST(req: Request){
             return IncorrectLogin()
         }
 
+        if(!usuario.senhaHash){
+            return IncorrectLogin()
+        }
+        
         const certa = await bcrypt.compare(bodyValidado.data.senha, usuario.senhaHash)
         if(!certa){
             return IncorrectLogin()
