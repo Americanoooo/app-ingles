@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
 
   const tokens = await respostaToken.json();
   let payloadVerificado
+  let usuarioId: number | null = null
   try{
   const {payload}= await jwtVerify(tokens.id_token, chavesGoogle, {
     
@@ -50,15 +51,35 @@ export async function GET(request: NextRequest) {
     audience: GOOGLE_CLIENT_ID
   })
   payloadVerificado = payload
+
+  if (!payloadVerificado.sub || typeof payloadVerificado.email !== "string") {
+  return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  const nomeGoogle =
+    typeof payloadVerificado.name === "string" ? payloadVerificado.name.trim() : "";
+    
+  const nome = (nomeGoogle || payloadVerificado.email.split("@")[0]).slice(0, 100);
+
+
+  usuarioId = await entrarComGoogle({
+  sub: payloadVerificado.sub,
+  email: payloadVerificado.email,
+  nome: nome,
+  emailVerificadoGoogle: payloadVerificado.email_verified === true,
+});
+
   }catch(err){
     console.error(err)
     payloadVerificado = null
 }
   
-  if(!payloadVerificado){
+  if(!payloadVerificado || !usuarioId){
     return NextResponse.redirect(new URL("/login", request.url));
 
   }
- 
 
+  await createSession(String(usuarioId))
+
+  return NextResponse.redirect(new URL("/treino", request.url));
     }
