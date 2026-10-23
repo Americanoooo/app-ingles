@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { pegarUsuarioId } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { BotaoGoogle } from "./components/BotaoGoogle";
 import { Logo } from "./components/Logo";
 import { BotaoVisitante } from "./components/landing/BotaoVisitante";
 import { QuizPreview } from "./components/landing/QuizPreview";
@@ -66,6 +67,7 @@ export default async function Home() {
           >
             Entrar
           </Link>
+          <BotaoGoogle />
 
           <div className="my-1 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="h-px flex-1 bg-border" />

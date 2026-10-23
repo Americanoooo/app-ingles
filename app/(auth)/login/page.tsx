@@ -8,6 +8,7 @@ import React, { use, useState } from "react";
 import { CircleAlert, CircleCheck, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BotaoGoogle } from "@/app/components/BotaoGoogle";
 import { Logo } from "@/app/components/Logo";
 import { TituloEscrito, duracaoEscrita } from "@/app/components/TituloEscrito";
 
@@ -232,6 +233,14 @@ function Login({ searchParams }: PageProps<"/login">) {
               {enviando && <Loader2 className="animate-spin" />}
               {enviando ? t.enviando : t.botao}
             </Button>
+
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              ou
+              <span className="h-px flex-1 bg-border" />
+            </div>
+
+            <BotaoGoogle desativado={enviando} />
 
             {/* Ponta do balão, como no ícone do app */}
             <span

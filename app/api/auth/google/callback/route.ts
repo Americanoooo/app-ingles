@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const stateCookie = request.cookies.get("google_state")?.value;
 
   if (!code || !state || error || !stateCookie || state !== stateCookie) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
   }
 
   const respostaToken = await fetch("https://oauth2.googleapis.com/token", {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!respostaToken.ok) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
   }
 
   const tokens = await respostaToken.json();
@@ -53,12 +53,12 @@ export async function GET(request: NextRequest) {
   payloadVerificado = payload
 
   if (!payloadVerificado.sub || typeof payloadVerificado.email !== "string") {
-  return NextResponse.redirect(new URL("/login", request.url));
+  return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
   }
 
   const nomeGoogle =
     typeof payloadVerificado.name === "string" ? payloadVerificado.name.trim() : "";
-    
+
   const nome = (nomeGoogle || payloadVerificado.email.split("@")[0]).slice(0, 100);
 
 
@@ -75,11 +75,15 @@ export async function GET(request: NextRequest) {
 }
   
   if(!payloadVerificado || !usuarioId){
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
 
   }
 
   await createSession(String(usuarioId))
 
-  return NextResponse.redirect(new URL("/treino", request.url));
+  if(usuarioId === null){
+    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
+  }
+
+  return NextResponse.redirect(new URL("/treino", GOOGLE_REDIRECT_URL));
     }
