@@ -8,13 +8,16 @@ const chavesGoogle = createRemoteJWKSet(
 );
 
 export async function GET(request: NextRequest) {
-  const { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URL, GOOGLE_CLIENT_SECRET } =
-    process.env;
-  if (!GOOGLE_CLIENT_ID || !GOOGLE_REDIRECT_URL || !GOOGLE_CLIENT_SECRET) {
+  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
+  if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
     throw new Error(
       "Variáveis de ambiente da Google não configuradas. Confira o .env",
     );
   }
+
+  const origem = request.nextUrl.origin;
+  // Mesma origem usada para montar o redirect_uri em /api/auth/google.
+  const redirectUri = new URL("/api/auth/google/callback", origem).toString();
 
   const code = request.nextUrl.searchParams.get("code");
   const state = request.nextUrl.searchParams.get("state");
@@ -23,7 +26,7 @@ export async function GET(request: NextRequest) {
   const stateCookie = request.cookies.get("google_state")?.value;
 
   if (!code || !state || error || !stateCookie || state !== stateCookie) {
-    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
+    return NextResponse.redirect(new URL("/login", origem));
   }
 
   const respostaToken = await fetch("https://oauth2.googleapis.com/token", {
@@ -32,13 +35,13 @@ export async function GET(request: NextRequest) {
       code: code,
       client_id: GOOGLE_CLIENT_ID,
       client_secret: GOOGLE_CLIENT_SECRET,
-      redirect_uri: GOOGLE_REDIRECT_URL,
+      redirect_uri: redirectUri,
       grant_type: "authorization_code",
     }),
   });
 
   if (!respostaToken.ok) {
-    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
+    return NextResponse.redirect(new URL("/login", origem));
   }
 
   const tokens = await respostaToken.json();
@@ -53,7 +56,7 @@ export async function GET(request: NextRequest) {
   payloadVerificado = payload
 
   if (!payloadVerificado.sub || typeof payloadVerificado.email !== "string") {
-  return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
+  return NextResponse.redirect(new URL("/login", origem));
   }
 
   const nomeGoogle =
@@ -75,15 +78,15 @@ export async function GET(request: NextRequest) {
 }
   
   if(!payloadVerificado || !usuarioId){
-    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
+    return NextResponse.redirect(new URL("/login", origem));
 
   }
 
   await createSession(String(usuarioId))
 
   if(usuarioId === null){
-    return NextResponse.redirect(new URL("/login", GOOGLE_REDIRECT_URL));
+    return NextResponse.redirect(new URL("/login", origem));
   }
 
-  return NextResponse.redirect(new URL("/treino", GOOGLE_REDIRECT_URL));
+  return NextResponse.redirect(new URL("/treino", origem));
     }

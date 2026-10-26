@@ -1,19 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 
-export async function GET (){
+export async function GET (request: NextRequest){
 
-     const {GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URL} = process.env
-     if(!GOOGLE_CLIENT_ID || !GOOGLE_REDIRECT_URL){
+     const {GOOGLE_CLIENT_ID} = process.env
+     if(!GOOGLE_CLIENT_ID){
         throw new Error('Variáveis de ambiente da Google não configuradas. Confira o .env')
     }
 
     const state = randomBytes(32).toString("hex")
 
+    // Construído a partir da própria request: assim funciona em qualquer ambiente
+    // (local, Codespaces, produção...) desde que a URL esteja cadastrada no Google Cloud Console.
+    const redirectUri = new URL("/api/auth/google/callback", request.nextUrl.origin).toString()
 
     const url = new URL("https://accounts.google.com/o/oauth2/v2/auth")
     url.searchParams.set("client_id", GOOGLE_CLIENT_ID)
-    url.searchParams.set("redirect_uri", GOOGLE_REDIRECT_URL)
+    url.searchParams.set("redirect_uri", redirectUri)
     url.searchParams.set("response_type", "code")
     url.searchParams.set("scope", "openid email profile")
     url.searchParams.set("state", state)
