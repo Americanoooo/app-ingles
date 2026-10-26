@@ -255,7 +255,7 @@ function Login({ searchParams }: PageProps<"/login">) {
               type="button"
               onClick={trocarModo}
               disabled={enviando}
-              className="rounded-md font-bold text-foreground underline decoration-primary disabled:pointer-events-none disabled:opacity-50 decoration-2 underline-offset-4 outline-none hover:decoration-primary-hover focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="rounded-md font-bold text-foreground underline decoration-primary disabled:pointer-events-none disabled:opacity-50 decoration-2 underline-offset-4 outline-none hover:decoration-primary-hover focus-visible:ring-3 focus-visible:ring-ring/50 cursor-pointer"
             >
               {t.trocaAcao}
             </button>
