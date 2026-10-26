@@ -3,6 +3,15 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// Monta a URL a partir das mesmas DB_* que lib/prisma.ts usa, em vez de uma
+// DATABASE_URL separada: evita migrate deploy rodar contra um banco diferente
+// do que a aplicação realmente usa.
+const { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+const databaseUrl =
+  DB_HOST && DB_USER && DB_PASSWORD && DB_NAME
+    ? `mysql://${encodeURIComponent(DB_USER)}:${encodeURIComponent(DB_PASSWORD)}@${DB_HOST}:${DB_PORT || 3306}/${DB_NAME}`
+    : undefined;
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -10,6 +19,6 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: databaseUrl,
   },
 });
