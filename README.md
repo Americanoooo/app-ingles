@@ -18,7 +18,7 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 ## ✨ Funcionalidades
 
 - **Landing page** — página pública de apresentação em `/`, com prévia de uma pergunta e da explicação da IA; quem já tem sessão válida é redirecionado direto para o treino.
-- **Autenticação completa** — cadastro e login com senha criptografada e sessão via cookie httpOnly (proteção contra roubo de token via XSS).
+- **Autenticação completa** — cadastro e login com senha criptografada, login com Google (OAuth 2.0 / OpenID Connect) e sessão via cookie httpOnly (proteção contra roubo de token via XSS).
 
   ![Tela de login](docs/login.png)
 
@@ -49,6 +49,7 @@ Depois do primeiro projeto de portfólio, eu queria sair da minha zona de confor
 **Front-end:** Next.js 16 (App Router) · React · TypeScript · Tailwind CSS + shadcn/ui
 **Back-end:** Next.js Route Handlers + Proxy (antigo middleware) · MySQL + Prisma 7 (adapter MariaDB) · Zod · bcrypt · jose (JWT em cookie httpOnly)
 **IA:** Google Gemini (endpoint compatível com OpenAI), saída estruturada via `json_schema`
+**Login com Google:** OAuth 2.0 / OpenID Connect, verificação do `id_token` via JWKS (`jose`)
 **Infraestrutura:** Docker + Docker Compose · Upstash Redis (rate limiting) · Vercel Cron · Deploy: Vercel (app) + Aiven (MySQL)
 
 ---
@@ -81,6 +82,8 @@ A correção mudou o fluxo: `/api/gerar-perguntas` passou a persistir quiz e per
 **Uma convenção de nomes, convertida num lugar só.** O banco usa snake_case e o restante da aplicação usa camelCase. A conversão acontece dentro dos models (`lib/models/*.model.ts`), logo depois da query — no caso das perguntas, numa função só (`paraPerguntaQuiz`) usada por todas as buscas: rotas e front nunca veem nome de coluna. Antes disso, uma rota devolvia a linha crua do banco enquanto outras já convertiam, e o mesmo dado chegava com dois formatos diferentes dependendo da tela — origem de vários bugs silenciosos, porque o TypeScript não acusa quando a interface descreve um formato que o dado real não tem.
 
 **Erro tratado por camada.** O model lança, a rota traduz para HTTP e o front exibe. As funções em `lib/respostas.ts` concentram os status e as mensagens voltadas ao usuário; o detalhe técnico vai só para o log. No cliente, o `apiFetch` converte qualquer resposta com status de erro em um `ApiError` que carrega status e mensagem, e a tela usa `instanceof` para distinguir "o servidor respondeu com erro" de "a requisição nem chegou lá" — só no primeiro caso a mensagem do backend é exibida. No proxy (`proxy.ts`, o antigo middleware do Next.js), a mesma ideia separa o que é falha de autenticação (bloqueia) do que é falha de infraestrutura do rate limit (registra no log e deixa passar).
+
+**Login com Google, sem confiar no front.** O `/api/auth/google` gera um `state` aleatório, grava num cookie httpOnly (escopado ao path do callback) e redireciona para o Google; o `/api/auth/google/callback` só segue adiante se o `state` que voltar na query bater com o do cookie — protege contra CSRF no fluxo OAuth. O `redirect_uri` é montado a partir da origem da própria request (não é uma URL fixa), então o mesmo código funciona em local, preview e produção, desde que a URL esteja cadastrada no Google Cloud Console. Depois de trocar o `code` pelo `id_token`, o token é verificado contra o JWKS do Google (`jose` + `createRemoteJWKSet`, checando `issuer` e `audience`) antes de qualquer dado ser lido dele — o payload não é confiável só porque veio da API do Google pela rede. Contas criadas via Google não têm senha (`senha_hash` ficou nullable no schema); o vínculo é pelo `google_sub`, não pelo email, para não permitir que alguém "sequestre" uma conta de senha só cadastrando o mesmo email no Google.
 
 ---
 
@@ -122,6 +125,8 @@ DB_NAME=app_ingles
 DB_PORT=3306
 JWT_SECRET=uma_chave_secreta_longa
 GEMINI_API_KEY=sua_chave_do_gemini
+GOOGLE_CLIENT_ID=id_do_client_oauth_do_google
+GOOGLE_CLIENT_SECRET=secret_do_client_oauth_do_google
 UPSTASH_REDIS_REST_URL=url_do_seu_redis
 UPSTASH_REDIS_REST_TOKEN=token_do_seu_redis
 CRON_SECRET=string_aleatoria_longa   # autentica a rota de limpeza
@@ -136,10 +141,11 @@ CRON_SECRET=string_aleatoria_longa   # autentica a rota de limpeza
 ```
 app/
 ├── page.tsx          # landing page (pública)
-├── (auth)/           # login/cadastro (público)
+├── (auth)/           # login/cadastro, termos e privacidade (público)
 ├── (app)/            # treino, relatório (autenticado) + layout com Navbar
-├── api/              # route handlers
-├── components/       # componentes do app (AuthGuard, Navbar, landing/…)
+├── api/
+│   └── auth/google/  # OAuth: redirect e callback do login com Google
+├── components/       # componentes do app (AuthGuard, Navbar, BotaoGoogle, landing/…)
 ├── opengraph-image.tsx  # imagem de compartilhamento gerada no build
 components/
 ├── ui/               # shadcn/ui
@@ -173,6 +179,6 @@ dockerfile
 
 ## English summary
 
-Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js 16 App Router, TypeScript, MySQL via Prisma 7), with a public landing page and a guest mode for trying it without signing up. The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. The same flow also rejects answers that aren't among the question's options, blocks answering a quiz twice (the check lives in the `UPDATE` itself, so concurrent requests can't both win), and the feedback route receives only a question id and builds the prompt from the database, so the client can't drive the LLM. The accepted trade-off — rows that start incomplete, and abandoned quizzes that pile up — is handled by a daily Vercel Cron cleanup route, authenticated by a shared secret rather than by session, which also wipes the shared guest account's history. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Multi-step writes run inside Prisma transactions, so a failure halfway leaves nothing behind. Session auth via httpOnly cookie (`jose`); ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
+Full-stack English trainer with AI-generated quizzes and per-question feedback (Next.js 16 App Router, TypeScript, MySQL via Prisma 7), with a public landing page and a guest mode for trying it without signing up. The server is the single source of truth for scoring: quizzes and questions — including the correct answers — are persisted when the quiz is generated, and `/api/responder` grades submissions against the database instead of trusting anything the client sends back. This closed a real vulnerability in v1, where the answer key round-tripped through the client and a forged 10/10 was possible from DevTools. The same flow also rejects answers that aren't among the question's options, blocks answering a quiz twice (the check lives in the `UPDATE` itself, so concurrent requests can't both win), and the feedback route receives only a question id and builds the prompt from the database, so the client can't drive the LLM. The accepted trade-off — rows that start incomplete, and abandoned quizzes that pile up — is handled by a daily Vercel Cron cleanup route, authenticated by a shared secret rather than by session, which also wipes the shared guest account's history. Questions and feedback come from Google Gemini (OpenAI-compatible endpoint) using structured output (`json_schema`), validated again with Zod before reaching the database. Multi-step writes run inside Prisma transactions, so a failure halfway leaves nothing behind. Session auth via httpOnly cookie (`jose`), with an optional Google OAuth 2.0 / OpenID Connect login — the `id_token` is verified against Google's JWKS before any claim is trusted, and the OAuth `state` is checked against an httpOnly cookie to prevent CSRF; ownership-based authorization prevents IDOR across users' quiz history; rate limiting is applied per IP on public routes and per user on authenticated ones.
 
 Demo: https://app-ingles-bay.vercel.app · Repo: github.com/Americanoooo/app-ingles
