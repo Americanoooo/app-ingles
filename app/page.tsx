@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { pegarUsuarioId } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { AvisoTermos } from "./components/AvisoTermos";
 import { BotaoGoogle } from "./components/BotaoGoogle";
 import { Logo } from "./components/Logo";
 import { BotaoVisitante } from "./components/landing/BotaoVisitante";
@@ -76,6 +77,8 @@ export default async function Home() {
           </div>
 
           <BotaoVisitante />
+
+          <AvisoTermos />
         </section>
 
         <QuizPreview className="lg:col-start-1 lg:row-start-2" />

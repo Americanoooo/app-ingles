@@ -8,6 +8,7 @@ import React, { use, useState } from "react";
 import { CircleAlert, CircleCheck, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AvisoTermos } from "@/app/components/AvisoTermos";
 import { BotaoGoogle } from "@/app/components/BotaoGoogle";
 import { Logo } from "@/app/components/Logo";
 import { TituloEscrito, duracaoEscrita } from "@/app/components/TituloEscrito";
@@ -248,6 +249,8 @@ function Login({ searchParams }: PageProps<"/login">) {
               className="absolute -bottom-[11px] left-10 size-5 rotate-45 border-r-2 border-b-2 border-border bg-card"
             />
           </form>
+
+          <AvisoTermos />
 
           <p className="text-center text-sm text-muted-foreground">
             {t.trocaPergunta}{" "}
